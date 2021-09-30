@@ -31,15 +31,24 @@ typedef FORECASTDATA = {}
 // Handles calls to IBM's JSON API.
 class APIHandler
 {
-	private static var APIKey:String = "d522aa97197fd864d36b418f39ebb323";
-
-	static var units:String = 'e';
-	static var areaCode:String = '86442:US';
-	static var lang:String = 'en-US';
+	private static var APIKey:String;
+	static var units:String;
+	static var areaCode:String;
+	static var lang:String;
 
 	// types
 	public static var _CCVARS:CCVARS;
 	public static var _LOCATIONDATA:LOCATIONDATA;
+
+	// Set up the API among other information using save data
+	public static function apiSetup()
+	{
+		OSSettings.initSave();
+		APIKey = FlxG.save.data.apiKey;
+		units = FlxG.save.data.units;
+		areaCode = FlxG.save.data.areaCode;
+		lang = FlxG.save.data.lang;
+	}
 
 	// https://weather.com/swagger-docs/ui/sun/v3/sunV3LocationSearch.json
 	public static function getLocationData():Void
@@ -110,7 +119,6 @@ class APIHandler
 	// Obtains a 7-Day Forecast, mainly used for
 	// The Week Ahead panels and the forecast panels.
 	// https://weather.com/swagger-docs/ui/sun/v1/sunV1DailyForecast.json
-	// NOTE: This part of the API can eat my fucking ass. ~JP
 	public static function get7Day():Void {}
 
 	// Obtains the current conditions around the region for the given

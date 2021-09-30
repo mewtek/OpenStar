@@ -79,11 +79,13 @@ class MainState extends FlxState
 		FlxG.autoPause = false; // Disable the program pausing when the window is out of focus
 
 		// get information from IBM
-		APIHandler.getLocationData(); // this needs to be ran before retrieving anything else in order to get latitude and longitude
+		APIHandler.apiSetup();
+		APIHandler.getLocationData(); // RUN THIS BEFORE RETRIEVING ANY OTHER INFORMATION
 		APIHandler.get36hour;
 		APIHandler.get7Day;
 		APIHandler.getCC();
 
+		trace(FlxG.save.data.apiKey);
 		OS_DEBUG = true;
 
 		// CREATE BACKGROUND
@@ -338,6 +340,7 @@ class MainState extends FlxState
 				ccPanel.alpha = 1;
 				ccIcon.alpha = 1;
 				ccTitle.alpha = 1;
+				tmr.destroy();
 			}
 		});
 

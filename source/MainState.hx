@@ -30,9 +30,13 @@ class MainState extends FlxState
 	private var noaaPanel:FlxSprite;
 
 	// Panel Titles
-	private var ccTitle:FlxSprite;
-	private var lfTitle:FlxSprite;
-	private var lrTitle:FlxSprite;
+	private var ccTitle:FlxSprite; // Current Conditions
+	private var lfTitle:FlxSprite; // Local Forecast
+	private var rrTitle:FlxSprite; // Regional Radar
+	private var lrTitle:FlxSprite; // Local Radar
+	private var drTitle:FlxSprite; // Satellite Radar (radar satellite)
+	private var alTitle:FlxSprite; // Almanac
+	private var twaTitle:FlxSprite; // The Week Ahead
 
 	// Text Elements
 	// LDL
@@ -110,8 +114,8 @@ class MainState extends FlxState
 
 		// Title Textures
 		var ccTitleTex = Resources.graphic('titles', 'current_conditions');
-		var lfTitleTex = Resources.graphic('titles', 'todays_forecast');
-		var lrTitleTex = Resources.graphic('titles', 'local_radar');
+		var lfTitleTex = Resources.graphic('titles', 'local-forecast');
+		var lrTitleTex = Resources.graphic('titles', 'regional_radar');
 
 		ccTitle = new FlxSprite(-174, -58);
 		ccTitle.loadGraphic(ccTitleTex);
@@ -317,6 +321,7 @@ class MainState extends FlxState
 		timeTicker.text = DateTools.format(Date.now(), "%I:%M");
 
 		// Presentations
+		// TODO: Make a better system for the presentation engine
 
 		// Fade in current conditions
 		new FlxTimer().start(0.5, function(tmr:FlxTimer)
@@ -342,6 +347,65 @@ class MainState extends FlxState
 				ccTitle.alpha = 1;
 				tmr.destroy();
 			}
+		});
+
+		new FlxTimer().start(10, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "CC FADEOUT";
+			ccPanel.alpha -= 0.3;
+			ccIcon.alpha -= 0.3;
+
+			for (i in 0...CCTXT.members.length)
+			{
+				CCTXT.members[i].alpha -= 0.3;
+
+				if (CCTXT.members[i].alpha == 0)
+					CCTXT.members[i].visible = false;
+			}
+
+			if (ccPanel.alpha == 0)
+			{
+				ccPanel.visible = false;
+				ccIcon.visible = false;
+				tmr.destroy();
+			}
+		});
+
+		new FlxTimer().start(10.2, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "CC RADAR";
+			tmr.destroy();
+			// TODO: IMPLEMENT CODE TO SHOW A REGIONAL CONDITION PRODUCT
+		});
+
+		new FlxTimer().start(20, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "CC RADAR FADEOUT";
+			ccTitle.alpha -= 0.3;
+
+			if (ccTitle.alpha == 0)
+			{
+				ccTitle.visible = false;
+				tmr.destroy();
+			}
+		});
+
+		new FlxTimer().start(20.2, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "REGIONAL RADAR";
+			tmr.destroy();
+		});
+
+		new FlxTimer().start(25, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "LOCAL RADAR";
+			tmr.destroy();
+		});
+
+		new FlxTimer().start(35, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "DOPPLER RADAR";
+			tmr.destroy();
 		});
 
 		super.update(elapsed);

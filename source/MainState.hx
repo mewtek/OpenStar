@@ -248,9 +248,9 @@ class MainState extends FlxState
 		for (i in 0...CCTXT.members.length)
 		{
 			CCTXT.members[i].antialiasing = true;
-			CCTXT.members[i].alpha = 1;
+			CCTXT.members[i].alpha = 0;
 		}
-		ccIcon.alpha = 1;
+		ccIcon.alpha = 0;
 
 		add(CCTXT);
 
@@ -259,7 +259,7 @@ class MainState extends FlxState
 
 		lf_cityName = new FlxText(150, 176, 0, APIHandler._LOCATIONDATA.cityName.toUpperCase());
 		dow = new FlxText(150, 275, 700, "Today");
-		forecastTxt = new FlxText(150, 350, 1620, "Rain. High 72F. Winds NNE at 10 to 15 mph. Chance of rain 100%. Rainfall may reach one inch.");
+		forecastTxt = new FlxText(150, 350, 1620, "Forecast Not Available"); // Should be updated automatically
 
 		lf_cityName.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
 		dow.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
@@ -308,7 +308,6 @@ class MainState extends FlxState
 		if (OS_DEBUG)
 		{
 			DEBUG_SLIDE_TXT.text = "CURRENT SLIDE: " + CURR_SLIDE;
-			CURR_SLIDE = "None";
 		}
 
 		// Update time in LDL
@@ -316,6 +315,31 @@ class MainState extends FlxState
 		timeTicker.text = DateTools.format(Date.now(), "%I:%M");
 
 		// Presentations
+
+		// Fade in current conditions
+		new FlxTimer().start(0.5, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "CC";
+			ccPanel.alpha += 0.1;
+			ccTitle.alpha += 0.1;
+			ccIcon.alpha += 0.1;
+
+			// Fade in text
+			for (i in 0...CCTXT.members.length)
+			{
+				CCTXT.members[i].alpha += 0.1;
+
+				if (CCTXT.members[i].alpha >= 1)
+					CCTXT.members[i].alpha = 1;
+			}
+
+			if (ccPanel.alpha >= 1) // Going to full alpha should sync with everything else, use the panel as a baseline
+			{
+				ccPanel.alpha = 1;
+				ccIcon.alpha = 1;
+				ccTitle.alpha = 1;
+			}
+		});
 
 		super.update(elapsed);
 	}

@@ -215,6 +215,7 @@ class MainState extends FlxState
 		// Current condtions
 
 		// check to see if an icon exists
+		// TODO: Properly rename icons to match their codes in assets
 		if (FileSystem.exists(Resources.icon(APIHandler._CCVARS.ccIconCode)))
 		{
 			ccIcon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
@@ -429,19 +430,94 @@ class MainState extends FlxState
 		new FlxTimer().start(20.2, function(tmr:FlxTimer)
 		{
 			CURR_SLIDE = "REGIONAL RADAR";
-			tmr.destroy();
+
+			rrTitle.alpha += 0.1;
+
+			// TODO: ADD CODE FOR SHOWING RADAR IMAGES
+
+			if (rrTitle.alpha >= 1)
+				tmr.destroy();
 		});
 
 		new FlxTimer().start(25, function(tmr:FlxTimer)
 		{
+			CURR_SLIDE = "REGIONAL RADAR FADEOUT";
+
+			rrTitle.alpha -= 0.3;
+
+			if (rrTitle.alpha == 0)
+			{
+				tmr.destroy();
+				rrTitle.visible = false;
+			}
+		});
+
+		new FlxTimer().start(25.2, function(tmr:FlxTimer)
+		{
 			CURR_SLIDE = "LOCAL RADAR";
-			tmr.destroy();
+
+			lrTitle.alpha += 0.1;
+
+			if (lrTitle.alpha >= 1)
+				tmr.destroy();
+		});
+
+		new FlxTimer().start(35, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "LOCAL RADAR FADEOUT";
+
+			lrTitle.alpha -= 0.3;
+
+			if (lrTitle.alpha == 0)
+			{
+				lrTitle.visible = false;
+				tmr.destroy();
+			}
 		});
 
 		new FlxTimer().start(35, function(tmr:FlxTimer)
 		{
 			CURR_SLIDE = "DOPPLER RADAR";
-			tmr.destroy();
+
+			drTitle.alpha += 0.1;
+
+			if (drTitle.alpha >= 1)
+				tmr.destroy();
+		});
+
+		new FlxTimer().start(45, function(tmr:FlxTimer)
+		{
+			CURR_SLIDE = "DOPPLER RADAR FADEOUT";
+			drTitle.alpha -= 0.3;
+
+			if (drTitle.alpha == 0)
+			{
+				drTitle.visible = false;
+				tmr.destroy();
+			}
+		});
+
+		new FlxTimer().start(45.2, function(tmr:FlxTimer)
+		{
+			// We can make multiple FlxTimers in this, which makes switching between the local forecast pretty easy
+			CURR_SLIDE = "LOCAL FORECAST";
+
+			lfTitle.alpha += 0.1;
+			lfPanel.alpha += 0.1;
+
+			for (i in 0...LFTXT.members.length)
+			{
+				LFTXT.members[i].alpha += 0.1;
+
+				if (LFTXT.members[i].alpha >= 1)
+					LFTXT.members[i].alpha = 1;
+			}
+
+			if (lfPanel.alpha >= 1)
+			{
+				lfTitle.alpha = 1;
+				lfPanel.alpha = 1;
+			}
 		});
 
 		super.update(elapsed);

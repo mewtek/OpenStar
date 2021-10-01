@@ -7,6 +7,7 @@ class OSSettings
 {
 	public static function initSave()
 	{
+		// API settings
 		if (FlxG.save.data.units == null)
 			FlxG.save.data.units = 'e'; // Default to imperial
 
@@ -16,10 +17,18 @@ class OSSettings
 		if (FlxG.save.data.lang == null)
 			FlxG.save.data.lang = "en-US"; // Default to American English
 
-		// API Key for IBM/TWC
-		// Feel free to use this one if you're building a custom version!
 		if (FlxG.save.data.apiKey == null)
-			FlxG.save.data.apiKey = "d522aa97197fd864d36b418f39ebb323";
+			FlxG.save.data.apiKey = "d522aa97197fd864d36b418f39ebb323"; // feel free to use this if you're building a custom version!
+
+		if (FlxG.save.data.lfOnlyUnit == null)
+			FlxG.save.data.lfOnlyUnit = false; // Do we want this unit to only do LOT8 simulation?
+
+		// Broadcast settings
+		if (FlxG.save.data.chromaColor == null)
+			FlxG.save.data.chromaColor = "0047bb"; // Defaults to using a blue screen chroma key (for OBS)
+
+		if (FlxG.save.data.EAS == null)
+			FlxG.save.data.EAS = false; // This will stop the unit entirely and just kick in the EAS substate.
 
 		// DEBUG SETTINGS - MAINLY FOR DEVELOPMENT \\
 

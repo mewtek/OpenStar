@@ -115,7 +115,11 @@ class MainState extends FlxState
 		// Title Textures
 		var ccTitleTex = Resources.graphic('titles', 'current_conditions');
 		var lfTitleTex = Resources.graphic('titles', 'local-forecast');
-		var lrTitleTex = Resources.graphic('titles', 'regional_radar');
+		var rrTitleTex = Resources.graphic('titles', 'regional_radar');
+		var lrTitleTex = Resources.graphic('titles', 'local_radar');
+		var drTitleTex = Resources.graphic('titles', 'radar_satellite');
+		var alTitleTex = Resources.graphic('titles', 'almanac');
+		var twaTitleTex = Resources.graphic('titles', '7day_outlook');
 
 		ccTitle = new FlxSprite(-174, -58);
 		ccTitle.loadGraphic(ccTitleTex);
@@ -133,6 +137,14 @@ class MainState extends FlxState
 		lfTitle.alpha = 0;
 		add(lfTitle);
 
+		rrTitle = new FlxSprite(-174, -58);
+		rrTitle.loadGraphic(rrTitleTex);
+		rrTitle.scale.x = 0.65;
+		rrTitle.scale.y = 0.65;
+		rrTitle.antialiasing = true;
+		rrTitle.alpha = 0;
+		add(rrTitle);
+
 		lrTitle = new FlxSprite(-174, -58);
 		lrTitle.loadGraphic(lrTitleTex);
 		lrTitle.scale.x = 0.65;
@@ -140,6 +152,30 @@ class MainState extends FlxState
 		lrTitle.antialiasing = true;
 		lrTitle.alpha = 0;
 		add(lrTitle);
+
+		drTitle = new FlxSprite(-174, -58);
+		drTitle.loadGraphic(drTitleTex);
+		drTitle.scale.x = 0.65;
+		drTitle.scale.y = 0.65;
+		drTitle.antialiasing = true;
+		drTitle.alpha = 0;
+		add(drTitle);
+
+		alTitle = new FlxSprite(-174, -58);
+		alTitle.loadGraphic(alTitleTex);
+		alTitle.scale.x = 0.65;
+		alTitle.scale.y = 0.65;
+		alTitle.antialiasing = true;
+		alTitle.alpha = 0;
+		add(alTitle);
+
+		twaTitle = new FlxSprite(-174, -58);
+		twaTitle.loadGraphic(twaTitleTex);
+		twaTitle.scale.x = 0.65;
+		twaTitle.scale.y = 0.65;
+		twaTitle.antialiasing = true;
+		twaTitle.alpha = 0;
+		add(twaTitle);
 
 		// CREATE PANELS \\
 

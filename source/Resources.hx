@@ -18,16 +18,21 @@ class Resources
 	{
 		if (lib == null)
 		{
-			return 'assets/sounds/narrations/$file.mp3';
+			return 'assets/narrations/$file.ogg';
 		}
 		else
 		{
-			return 'assets/sounds/narrations/$lib/$file.mp3';
+			return 'assets/narrations/$lib/$file.ogg';
 		}
 	}
 
 	public static function font(file:String)
 	{
 		return 'assets/fonts/$file.ttf';
+	}
+
+	public static function music(file:String) // Remember to use the full file for this
+	{
+		return 'assets/music/$file';
 	}
 }

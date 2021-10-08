@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.system.FlxSound;
 import flixel.system.debug.watch.Tracker;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
@@ -76,6 +77,11 @@ class MainState extends FlxState
 	private var CURR_SLIDE:String;
 	private var DEBUG_SLIDE_TXT:FlxText;
 
+	// Sounds
+	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
+	private var LOCALVOCAL_TMP:FlxSound; // Temperature narration
+	private var LOCALVOCAL_INTRO:FlxSound; // CC Intro
+
 	override public function create():Void
 	{
 		CURR_SLIDE = "None";
@@ -110,6 +116,11 @@ class MainState extends FlxState
 			bg.antialiasing = false;
 			add(bg);
 		}
+
+		// TODO: Automatically create a list of music using files in assets/music
+		if (FlxG.sound.music == null)
+			FlxG.sound.playMusic(Resources.music("jazzpiano.ogg"), 0.8, true);
+
 		// CREATE PANEL TITLES \\
 
 		// Title Textures
@@ -215,7 +226,6 @@ class MainState extends FlxState
 		// Current condtions
 
 		// check to see if an icon exists
-		// TODO: Properly rename icons to match their codes in assets
 		if (FileSystem.exists(Resources.icon(APIHandler._CCVARS.ccIconCode)))
 		{
 			ccIcon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
@@ -342,6 +352,24 @@ class MainState extends FlxState
 		// LDLslide.setFormat(Resources.font('interstate-bold'), 40, FlxColor.fromString("0x697ca2"));
 		// LDLslide.antialiasing = true;
 		// add(LDLslide);
+
+		// Narrations
+
+		LOCALVOCAL_INTRO = FlxG.sound.load(Resources.narration("CC_INTRO1", null), 1.0, false, null, false, false, null, () -> LOCALVOCAL_TMP.play());
+		LOCALVOCAL_TMP = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.temperature}', "temperatures"), 1.0, false, null, false, false, null,
+			() -> LOCALVOCAL_CC.play());
+		LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions")); // Don't ask.
+
+		/*
+			I genuinely don't know why, but for some god-forsaken reason,
+			using the StartTime variable in the play() function for FlxG doesn't actually
+			do anything besides completely ignoring the onComplete() function that's done when
+			these are all loaded into the state.
+		 */
+		new FlxTimer().start(1, function(tmr:FlxTimer)
+		{
+			LOCALVOCAL_INTRO.play();
+		});
 	}
 
 	// Everything in this function will be called every frame
@@ -352,6 +380,12 @@ class MainState extends FlxState
 		{
 			DEBUG_SLIDE_TXT.text = "CURRENT SLIDE: " + CURR_SLIDE;
 		}
+
+		// Lower audio when any of the local vocals are playing
+		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing)
+			FlxG.sound.music.volume = 0.1;
+		else
+			FlxG.sound.music.volume = 0.8;
 
 		// Update time in LDL
 		// trace(DateTools.format(Date.now(), "%I:%M"));

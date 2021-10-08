@@ -223,7 +223,7 @@ class MainState extends FlxState
 		else
 		{
 			trace('FAILED TO FIND ICON CODE ${APIHandler._CCVARS.ccIconCode}, DEFAULTING TO N/A ICON');
-			ccIcon = new FlxSprite().loadGraphic(Resources.icon('Not Available'), false);
+			ccIcon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
 		}
 
 		ccIcon.scale.set(1.7, 1.7);

@@ -90,7 +90,7 @@ class MainState extends FlxState
 		APIHandler.getCC();
 
 		trace(FlxG.save.data.apiKey);
-		OS_DEBUG = true;
+		OS_DEBUG = FlxG.save.data.OS_DEBUG;
 
 		// CREATE BACKGROUND
 

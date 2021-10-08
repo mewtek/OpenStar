@@ -19,8 +19,6 @@ import sys.FileSystem;
 
 class MainState extends FlxState
 {
-	private var TestTimer:FlxTimer;
-
 	private var OS_DEBUG:Bool;
 	private var activeAlert:Bool;
 
@@ -74,9 +72,6 @@ class MainState extends FlxState
 	private var dow:FlxText; // Day of Week
 	private var forecastTxt:FlxText;
 
-	private var CURR_SLIDE:String;
-	private var DEBUG_SLIDE_TXT:FlxText;
-
 	// Sounds
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
 	private var LOCALVOCAL_TMP:FlxSound; // Temperature narration
@@ -84,7 +79,6 @@ class MainState extends FlxState
 
 	override public function create():Void
 	{
-		CURR_SLIDE = "None";
 		FlxG.mouse.visible = false;
 		FlxG.autoPause = false; // Disable the program pausing when the window is out of focus
 
@@ -106,8 +100,6 @@ class MainState extends FlxState
 			// vv Basically the WeatherSTAR 4000 BG gradient, a bit easier to see draw boxes with
 			var bg:FlxSprite = FlxGradient.createGradientFlxSprite(1920, 1080, [FlxColor.fromString('0x1d0255'), FlxColor.fromString('0xba5c13')], 1, 90);
 			add(bg);
-			DEBUG_SLIDE_TXT = new FlxText(0, 0, 0, "CURRENT SLIDE: XXXX", 19); // Updated in update() function
-			add(DEBUG_SLIDE_TXT);
 		}
 		else
 		{
@@ -376,11 +368,6 @@ class MainState extends FlxState
 	// Remember to destroy your timers!
 	override public function update(elapsed):Void
 	{
-		if (OS_DEBUG)
-		{
-			DEBUG_SLIDE_TXT.text = "CURRENT SLIDE: " + CURR_SLIDE;
-		}
-
 		// Lower audio when any of the local vocals are playing
 		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing)
 			FlxG.sound.music.volume = 0.1;
@@ -397,7 +384,6 @@ class MainState extends FlxState
 		// Fade in current conditions
 		new FlxTimer().start(0.5, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "CC";
 			ccPanel.alpha += 0.1;
 			ccTitle.alpha += 0.1;
 			ccIcon.alpha += 0.1;
@@ -422,7 +408,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(10, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "CC FADEOUT";
 			ccPanel.alpha -= 0.3;
 			ccIcon.alpha -= 0.3;
 
@@ -444,14 +429,12 @@ class MainState extends FlxState
 
 		new FlxTimer().start(10.2, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "CC RADAR";
 			tmr.destroy();
 			// TODO: IMPLEMENT CODE TO SHOW A REGIONAL CONDITION PRODUCT
 		});
 
 		new FlxTimer().start(20, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "CC RADAR FADEOUT";
 			ccTitle.alpha -= 0.3;
 
 			if (ccTitle.alpha == 0)
@@ -463,8 +446,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(20.2, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "REGIONAL RADAR";
-
 			rrTitle.alpha += 0.1;
 
 			// TODO: ADD CODE FOR SHOWING RADAR IMAGES
@@ -475,8 +456,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(25, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "REGIONAL RADAR FADEOUT";
-
 			rrTitle.alpha -= 0.3;
 
 			if (rrTitle.alpha == 0)
@@ -488,8 +467,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(25.2, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "LOCAL RADAR";
-
 			lrTitle.alpha += 0.1;
 
 			if (lrTitle.alpha >= 1)
@@ -498,8 +475,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(35, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "LOCAL RADAR FADEOUT";
-
 			lrTitle.alpha -= 0.3;
 
 			if (lrTitle.alpha == 0)
@@ -511,8 +486,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(35, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "DOPPLER RADAR";
-
 			drTitle.alpha += 0.1;
 
 			if (drTitle.alpha >= 1)
@@ -521,7 +494,6 @@ class MainState extends FlxState
 
 		new FlxTimer().start(45, function(tmr:FlxTimer)
 		{
-			CURR_SLIDE = "DOPPLER RADAR FADEOUT";
 			drTitle.alpha -= 0.3;
 
 			if (drTitle.alpha == 0)
@@ -534,7 +506,6 @@ class MainState extends FlxState
 		new FlxTimer().start(45.2, function(tmr:FlxTimer)
 		{
 			// We can make multiple FlxTimers in this, which makes switching between the local forecast pretty easy
-			CURR_SLIDE = "LOCAL FORECAST";
 
 			lfTitle.alpha += 0.1;
 			lfPanel.alpha += 0.1;

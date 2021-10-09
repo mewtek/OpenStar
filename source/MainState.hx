@@ -68,9 +68,9 @@ class MainState extends FlxState
 
 	// 36-Hour forecast panel
 	private var LFTXT:FlxTypedGroup<FlxText>;
+	private var DOWTXT:FlxTypedGroup<FlxText>;
+	private var NARRATIVES:FlxTypedGroup<FlxText>;
 	private var lf_cityName:FlxText;
-	private var dow:FlxText; // Day of Week
-	private var forecastTxt:FlxText;
 
 	// Sounds
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
@@ -301,21 +301,37 @@ class MainState extends FlxState
 
 		// 36-hour forecast
 		LFTXT = new FlxTypedGroup<FlxText>();
+		DOWTXT = new FlxTypedGroup<FlxText>();
+		NARRATIVES = new FlxTypedGroup<FlxText>();
 
 		lf_cityName = new FlxText(150, 176, 0, APIHandler._LOCATIONDATA.cityName.toUpperCase());
-		dow = new FlxText(150, 275, 700, "Today");
-		forecastTxt = new FlxText(150, 350, 1620, "Forecast Not Available"); // Should be updated automatically
-
 		lf_cityName.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
-		dow.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
-		forecastTxt.setFormat(Resources.font('interstate-bold'), 65, FlxColor.WHITE, LEFT);
+
+		// tfw I was about to do this by making a shitload of FlxText variables
+		// https://github.com/AyeTSG/Funkin_SmallThings/blob/master/source/OptionsMenu.hx
+		for (i in 0...APIHandler._FORECASTDATA.dow.length)
+		{
+			var txt = new FlxText(150, 275, 700, APIHandler._FORECASTDATA.dow[i]);
+			txt.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
+			txt.alpha = 0;
+			txt.antialiasing = true;
+			txt.ID = i;
+			DOWTXT.add(txt);
+		}
+
+		for (i in 0...APIHandler._FORECASTDATA.narrative.length)
+		{
+			var txt = new FlxText(150, 350, 1620, APIHandler._FORECASTDATA.narrative[i]);
+			txt.setFormat(Resources.font('interstate-bold'), 65, FlxColor.WHITE, LEFT);
+			txt.alpha = 0;
+			txt.antialiasing = true;
+			txt.ID = i;
+			NARRATIVES.add(txt);
+		}
 
 		LFTXT.add(lf_cityName); // 0
-		LFTXT.add(dow); // 1
-		LFTXT.add(forecastTxt); // 2
 
-		LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[0];
-		LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[0];
+		// Set text automatically
 
 		for (i in 0...APIHandler._FORECASTDATA.dow.length) {}
 
@@ -326,6 +342,8 @@ class MainState extends FlxState
 		}
 
 		add(LFTXT);
+		add(DOWTXT);
+		add(NARRATIVES);
 
 		// 7-Day outlook panel
 
@@ -514,6 +532,8 @@ class MainState extends FlxState
 
 			lfTitle.alpha += 0.1;
 			lfPanel.alpha += 0.1;
+			DOWTXT.members[0].alpha += 0.1;
+			NARRATIVES.members[0].alpha += 0.1;
 
 			for (i in 0...LFTXT.members.length)
 			{
@@ -529,79 +549,119 @@ class MainState extends FlxState
 				lfPanel.alpha = 1;
 			}
 
-			// Switch between all of the forecasts.
-			// I know, this is a shit way of doing it, but its the only way i could find that worked and didn't screw with the thing.
-			new FlxTimer().start(6, function(tmr:FlxTimer)
+			if (DOWTXT.members[0].alpha >= 1)
 			{
-				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[0]
-					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[0])
-				{
-					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[1];
-					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[1];
-				}
-				else
-				{
-					tmr.cancel();
-					tmr.destroy();
-				}
-			});
+				DOWTXT.members[0].alpha = 1;
+				NARRATIVES.members[0].alpha = 1;
+			}
 
+			// Switch between all of the forecasts.
+			// This only uses 5 forecasts because there's unfortunately no options for just doing
+			// an actual 36-hour forecast (1 1/2 days)
 			new FlxTimer().start(12, function(tmr:FlxTimer)
 			{
-				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[1]
-					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[1])
+				DOWTXT.members[0].alpha -= 0.3;
+				NARRATIVES.members[0].alpha -= 0.3;
+
+				if (NARRATIVES.members[0].alpha == 0)
 				{
-					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[2];
-					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[2];
-				}
-				else
-				{
-					tmr.cancel();
+					DOWTXT.members[0].visible = false;
+					NARRATIVES.members[0].visible = false;
 					tmr.destroy();
 				}
 			});
 
-			new FlxTimer().start(18, function(tmr:FlxTimer)
+			new FlxTimer().start(12.2, function(tmr:FlxTimer)
 			{
-				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[2]
-					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[2])
+				DOWTXT.members[1].alpha += 0.1;
+				NARRATIVES.members[1].alpha += 0.1;
+
+				if (NARRATIVES.members[1].alpha >= 1)
 				{
-					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[3];
-					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[3];
-				}
-				else
-				{
-					tmr.cancel();
+					DOWTXT.members[1].alpha = 1;
+					NARRATIVES.members[1].alpha = 1;
+
 					tmr.destroy();
 				}
 			});
 
 			new FlxTimer().start(24, function(tmr:FlxTimer)
 			{
-				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[3]
-					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[3])
+				DOWTXT.members[1].alpha -= 0.3;
+				NARRATIVES.members[1].alpha -= 0.3;
+
+				if (NARRATIVES.members[1].alpha == 0)
 				{
-					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[4];
-					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[4];
-				}
-				else
-				{
-					tmr.cancel();
+					DOWTXT.members[1].visible = false;
+					NARRATIVES.members[1].visible = false;
 					tmr.destroy();
 				}
 			});
 
-			new FlxTimer().start(30, function(tmr:FlxTimer)
+			new FlxTimer().start(24.2, function(tmr:FlxTimer)
 			{
-				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[4]
-					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[4])
+				DOWTXT.members[2].alpha += 0.1;
+				NARRATIVES.members[2].alpha += 0.1;
+
+				if (NARRATIVES.members[2].alpha >= 1)
 				{
-					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[5];
-					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[5];
+					DOWTXT.members[2].alpha = 1;
+					NARRATIVES.members[2].alpha = 1;
+
+					tmr.destroy();
 				}
-				else
+			});
+
+			new FlxTimer().start(36, function(tmr:FlxTimer)
+			{
+				DOWTXT.members[2].alpha -= 0.3;
+				NARRATIVES.members[2].alpha -= 0.3;
+
+				if (NARRATIVES.members[2].alpha == 0)
 				{
-					tmr.cancel();
+					DOWTXT.members[2].visible = false;
+					NARRATIVES.members[2].visible = false;
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(36.2, function(tmr:FlxTimer)
+			{
+				DOWTXT.members[3].alpha += 0.1;
+				NARRATIVES.members[3].alpha += 0.1;
+
+				if (NARRATIVES.members[3].alpha >= 1)
+				{
+					DOWTXT.members[3].alpha = 1;
+					NARRATIVES.members[3].alpha = 1;
+
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(48, function(tmr:FlxTimer)
+			{
+				DOWTXT.members[3].alpha -= 0.3;
+				NARRATIVES.members[3].alpha -= 0.3;
+
+				if (NARRATIVES.members[3].alpha == 0)
+				{
+					DOWTXT.members[3].visible = false;
+					NARRATIVES.members[3].visible = false;
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(48.2, function(tmr:FlxTimer)
+			{
+				DOWTXT.members[4].alpha += 0.1;
+				NARRATIVES.members[4].alpha += 0.1;
+
+				if (NARRATIVES.members[4].alpha >= 1)
+				{
+					DOWTXT.members[4].alpha = 1;
+					NARRATIVES.members[4].alpha = 1;
+
 					tmr.destroy();
 				}
 			});

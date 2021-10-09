@@ -26,7 +26,11 @@ typedef CCVARS =
 	var baroTrend:String;
 }
 
-typedef FORECASTDATA = {}
+typedef FORECASTDATA =
+{
+	var dow:Array<String>;
+	var narrative:Array<String>;
+}
 
 // Handles calls to IBM's JSON API.
 class APIHandler
@@ -39,6 +43,7 @@ class APIHandler
 	// types
 	public static var _CCVARS:CCVARS;
 	public static var _LOCATIONDATA:LOCATIONDATA;
+	public static var _FORECASTDATA:FORECASTDATA;
 
 	// Set up the API among other information using save data
 	public static function apiSetup()
@@ -67,6 +72,9 @@ class APIHandler
 				lat: res.location.latitude,
 				long: res.location.longitude
 			};
+
+			trace(res.location.latitude);
+			trace(res.location.longitude);
 		}
 
 		API.onError = function(erMsg)
@@ -111,9 +119,63 @@ class APIHandler
 
 	// Obtain information for the 36-Hour forecast
 	// NOTE: getLocationData() needs to be ran so this function can get the latitude and longitude for the location!
+	// https://weather.com/swagger-docs/ui/sun/v1/sunV1DailyForecast.json
 	public static function get36hour():Void
 	{
-		var APIURL:String = 'https://api.weather.gov/v1/geocode/${_LOCATIONDATA.lat}/${_LOCATIONDATA.long}/3day.json?language=$lang&units=$units&apiKey=$APIKey';
+		var APIURL:String = 'https://api.weather.com/v1/geocode/${_LOCATIONDATA.lat}/${_LOCATIONDATA.long}/forecast/daily/3day.json?apiKey=${APIKey}&units=${units}&language=$lang';
+		var API = new haxe.Http(APIURL);
+
+		var names:Array<String> = [];
+		var narratives:Array<String> = [];
+
+		API.onData = function(data:String)
+		{
+			var res = Json.parse(data);
+
+			for (i in 0...res.forecasts.length)
+			{
+				// obtain daypart names
+				trace(i);
+
+				if (res.forecasts[i].alt_daypart_name != null)
+				{
+					names.push(res.forecasts[i].alt_daypart_name);
+					names.push(res.forecasts[i].night.alt_daypart_name);
+				}
+				else
+				{
+					names.push(res.forecasts[i].dow);
+					names.push(res.forecasts[i].night.alt_daypart_name);
+				}
+
+				// obtain forecasts
+				if (res.forecasts[i].narrative != null)
+					narratives.push(res.forecasts[i].narrative);
+				else
+					narratives.push("Forecast not available.");
+
+				if (res.forecasts[i].night.narrative != null)
+					narratives.push(res.forecasts[i].night.narrative);
+				else
+					narratives.push("Forecast not available.");
+			}
+
+			trace(names.length);
+			trace(narratives.length);
+
+			_FORECASTDATA = {
+				dow: names,
+				narrative: narratives
+			};
+		}
+
+		API.onError = function(msg:String)
+		{
+			trace("WHOOPS, THERE'S A PROBLEM!");
+			trace(msg);
+		}
+
+		API.request();
 	}
 
 	// Obtains a 7-Day Forecast, mainly used for

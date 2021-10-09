@@ -85,7 +85,7 @@ class MainState extends FlxState
 		// get information from IBM
 		APIHandler.apiSetup();
 		APIHandler.getLocationData(); // RUN THIS BEFORE RETRIEVING ANY OTHER INFORMATION
-		APIHandler.get36hour;
+		APIHandler.get36hour();
 		APIHandler.get7Day;
 		APIHandler.getCC();
 
@@ -310,9 +310,14 @@ class MainState extends FlxState
 		dow.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
 		forecastTxt.setFormat(Resources.font('interstate-bold'), 65, FlxColor.WHITE, LEFT);
 
-		LFTXT.add(lf_cityName);
-		LFTXT.add(dow);
-		LFTXT.add(forecastTxt);
+		LFTXT.add(lf_cityName); // 0
+		LFTXT.add(dow); // 1
+		LFTXT.add(forecastTxt); // 2
+
+		LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[0];
+		LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[0];
+
+		for (i in 0...APIHandler._FORECASTDATA.dow.length) {}
 
 		for (i in 0...LFTXT.members.length)
 		{
@@ -523,6 +528,83 @@ class MainState extends FlxState
 				lfTitle.alpha = 1;
 				lfPanel.alpha = 1;
 			}
+
+			// Switch between all of the forecasts.
+			// I know, this is a shit way of doing it, but its the only way i could find that worked and didn't screw with the thing.
+			new FlxTimer().start(6, function(tmr:FlxTimer)
+			{
+				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[0]
+					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[0])
+				{
+					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[1];
+					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[1];
+				}
+				else
+				{
+					tmr.cancel();
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(12, function(tmr:FlxTimer)
+			{
+				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[1]
+					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[1])
+				{
+					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[2];
+					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[2];
+				}
+				else
+				{
+					tmr.cancel();
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(18, function(tmr:FlxTimer)
+			{
+				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[2]
+					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[2])
+				{
+					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[3];
+					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[3];
+				}
+				else
+				{
+					tmr.cancel();
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(24, function(tmr:FlxTimer)
+			{
+				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[3]
+					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[3])
+				{
+					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[4];
+					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[4];
+				}
+				else
+				{
+					tmr.cancel();
+					tmr.destroy();
+				}
+			});
+
+			new FlxTimer().start(30, function(tmr:FlxTimer)
+			{
+				if (LFTXT.members[1].text == APIHandler._FORECASTDATA.dow[4]
+					&& LFTXT.members[2].text == APIHandler._FORECASTDATA.narrative[4])
+				{
+					LFTXT.members[1].text = APIHandler._FORECASTDATA.dow[5];
+					LFTXT.members[2].text = APIHandler._FORECASTDATA.narrative[5];
+				}
+				else
+				{
+					tmr.cancel();
+					tmr.destroy();
+				}
+			});
 		});
 
 		super.update(elapsed);

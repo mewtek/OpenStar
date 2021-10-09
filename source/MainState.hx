@@ -17,6 +17,8 @@ import lime.math.BGRA;
 import lime.utils.Resource;
 import sys.FileSystem;
 
+using StringTools;
+
 class MainState extends FlxState
 {
 	private var OS_DEBUG:Bool;
@@ -76,6 +78,7 @@ class MainState extends FlxState
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
 	private var LOCALVOCAL_TMP:FlxSound; // Temperature narration
 	private var LOCALVOCAL_INTRO:FlxSound; // CC Intro
+	private var music_playlist:Array<String>; // String array of every music file in assets/music/
 
 	override public function create():Void
 	{
@@ -109,9 +112,11 @@ class MainState extends FlxState
 			add(bg);
 		}
 
-		// TODO: Automatically create a list of music using files in assets/music
+		makeMusicPL();
 		if (FlxG.sound.music == null)
-			FlxG.sound.playMusic(Resources.music("jazzpiano.ogg"), 0.8, true);
+		{
+			FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
+		}
 
 		// CREATE PANEL TITLES \\
 
@@ -385,6 +390,26 @@ class MainState extends FlxState
 		{
 			LOCALVOCAL_INTRO.play();
 		});
+	}
+
+	function makeMusicPL():Array<String>
+	{
+		music_playlist = [];
+
+		trace(FileSystem.readDirectory('assets/music'));
+
+		for (i in 0...FileSystem.readDirectory('assets/music').length)
+		{
+			var filename:String = FileSystem.readDirectory('assets/music')[i];
+
+			if (filename.endsWith('ogg'))
+				music_playlist.push(FileSystem.readDirectory('assets/music')[i]);
+			else
+				trace('SKIPPING OVER ${FileSystem.readDirectory('assets/music')[i]} -- NOT A .OGG FILE');
+		}
+
+		trace(music_playlist);
+		return music_playlist;
 	}
 
 	// Everything in this function will be called every frame

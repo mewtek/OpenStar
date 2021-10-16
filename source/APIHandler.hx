@@ -208,17 +208,17 @@ class APIHandler
 	// Pulls from MapBox to get the base map for Radar and whatnot.
 	// downloads as a 2560x1440 image instead of 1280x720.
 	// TODO: Rebuild the asset library for assets/images after this function is ran!!
-	public static function getMap():Void
-	{
-		trace("DOWNLOADING MAP DATA");
-		var l:URLLoader = new URLLoader();
-		l.dataFormat = URLLoaderDataFormat.BINARY;
-		l.addEventListener(Event.COMPLETE, function(e:Event)
-		{
-			var path:String = 'assets/images/radar/map.png';
-			File.saveBytes(path, l.data);
-			trace("Downloaded a map that was " + l.data.length + " bytes.");
-		});
-		l.load(new URLRequest('https://api.mapbox.com/styles/v1/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc/static/${_LOCATIONDATA.long},${_LOCATIONDATA.lat},8.43,0,1/1280x720@2x?access_token=pk.eyJ1IjoiemVleGVsMzIiLCJhIjoiY2tzemU0M2o5MHl3ODJwcWl2YjhxbnRxOCJ9.don8TkevF9UuD_v11OPKiw'));
-	}
+	// public static function getMap():Void
+	// {
+	// 	trace("DOWNLOADING MAP DATA");
+	// 	var l:URLLoader = new URLLoader();
+	// 	l.dataFormat = URLLoaderDataFormat.BINARY;
+	// 	l.addEventListener(Event.COMPLETE, function(e:Event)
+	// 	{
+	// 		var path:String = 'assets/images/radar/map.png';
+	// 		File.saveBytes(path, l.data);
+	// 		trace("Downloaded a map that was " + l.data.length + " bytes.");
+	// 	});
+	// 	l.load(new URLRequest('https://api.mapbox.com/styles/v1/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc/static/${_LOCATIONDATA.long},${_LOCATIONDATA.lat},8.43,0,1/1280x720@2x?access_token=pk.eyJ1IjoiemVleGVsMzIiLCJhIjoiY2tzemU0M2o5MHl3ODJwcWl2YjhxbnRxOCJ9.don8TkevF9UuD_v11OPKiw'));
+	// }
 }

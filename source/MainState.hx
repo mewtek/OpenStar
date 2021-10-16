@@ -5,7 +5,9 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.graphics.FlxGraphic;
 import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.system.FlxAssets;
 import flixel.system.FlxSound;
 import flixel.system.debug.watch.Tracker;
 import flixel.text.FlxText;
@@ -13,9 +15,13 @@ import flixel.util.FlxColor;
 import flixel.util.FlxGradient;
 import flixel.util.FlxGradient;
 import flixel.util.FlxTimer;
+import haxe.io.Path;
 import lime.math.BGRA;
 import lime.utils.Resource;
+import openfl.display.BitmapData;
+import openfl.utils.ByteArray;
 import sys.FileSystem;
+import sys.io.File;
 
 using StringTools;
 
@@ -69,7 +75,6 @@ class MainState extends FlxState
 	private var gustTxt:FlxText;
 
 	// 36-Hour forecast panel
-	private var LFTXT:FlxTypedGroup<FlxText>;
 	private var DOWTXT:FlxTypedGroup<FlxText>;
 	private var NARRATIVES:FlxTypedGroup<FlxText>;
 	private var lf_cityName:FlxText;
@@ -80,6 +85,9 @@ class MainState extends FlxState
 	private var LOCALVOCAL_INTRO:FlxSound; // CC Intro
 	private var music_playlist:Array<String>; // String array of every music file in assets/music/
 
+	// Maps
+	private var map:FlxSprite;
+
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
@@ -87,10 +95,10 @@ class MainState extends FlxState
 
 		// get information from IBM
 		APIHandler.apiSetup();
-		APIHandler.getLocationData(); // RUN THIS BEFORE RETRIEVING ANY OTHER INFORMATION
 		APIHandler.get36hour();
-		APIHandler.get7Day;
+		APIHandler.get7Day();
 		APIHandler.getCC();
+		// APIHandler.getMap();
 
 		trace(FlxG.save.data.apiKey);
 		OS_DEBUG = FlxG.save.data.OS_DEBUG;
@@ -118,9 +126,20 @@ class MainState extends FlxState
 			FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
 		}
 
+		// create map
+		// map = new FlxSprite(0, 0);
+		// map.loadGraphic(FlxAssets.getBitmapData('assets/images/radar/map.png'));
+		// map.scale.x = 0.8;
+		// map.scale.y = 0.8;
+		// map.antialiasing = true;
+		// map.alpha = 0;
+		// map.screenCenter(XY);
+		// add(map);
+
 		// CREATE PANEL TITLES \\
 
 		// Title Textures
+
 		var ccTitleTex = Resources.graphic('titles', 'current_conditions');
 		var lfTitleTex = Resources.graphic('titles', 'local-forecast');
 		var rrTitleTex = Resources.graphic('titles', 'regional_radar');
@@ -305,12 +324,13 @@ class MainState extends FlxState
 		add(CCTXT);
 
 		// 36-hour forecast
-		LFTXT = new FlxTypedGroup<FlxText>();
 		DOWTXT = new FlxTypedGroup<FlxText>();
 		NARRATIVES = new FlxTypedGroup<FlxText>();
 
 		lf_cityName = new FlxText(150, 176, 0, APIHandler._LOCATIONDATA.cityName.toUpperCase());
 		lf_cityName.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
+		lf_cityName.antialiasing = true;
+		lf_cityName.alpha = 0;
 
 		// tfw I was about to do this by making a shitload of FlxText variables
 		// https://github.com/AyeTSG/Funkin_SmallThings/blob/master/source/OptionsMenu.hx
@@ -334,19 +354,7 @@ class MainState extends FlxState
 			NARRATIVES.add(txt);
 		}
 
-		LFTXT.add(lf_cityName); // 0
-
-		// Set text automatically
-
-		for (i in 0...APIHandler._FORECASTDATA.dow.length) {}
-
-		for (i in 0...LFTXT.members.length)
-		{
-			LFTXT.members[i].antialiasing = true;
-			LFTXT.members[i].alpha = 0;
-		}
-
-		add(LFTXT);
+		add(lf_cityName);
 		add(DOWTXT);
 		add(NARRATIVES);
 
@@ -426,15 +434,15 @@ class MainState extends FlxState
 		// trace(DateTools.format(Date.now(), "%I:%M"));
 		timeTicker.text = DateTools.format(Date.now(), "%I:%M");
 
-		// Presentations
-		// TODO: Make a better system for the presentation engine
-
 		// Fade in current conditions
 		new FlxTimer().start(0.5, function(tmr:FlxTimer)
 		{
-			ccPanel.alpha += 0.1;
-			ccTitle.alpha += 0.1;
-			ccIcon.alpha += 0.1;
+			if (ccPanel != null)
+			{
+				ccPanel.alpha += 0.1;
+				ccTitle.alpha += 0.1;
+				ccIcon.alpha += 0.1;
+			}
 
 			// Fade in text
 			for (i in 0...CCTXT.members.length)
@@ -452,244 +460,315 @@ class MainState extends FlxState
 				ccTitle.alpha = 1;
 				tmr.destroy();
 			}
-		});
+		}, 1);
 
 		new FlxTimer().start(10, function(tmr:FlxTimer)
 		{
-			ccPanel.alpha -= 0.3;
-			ccIcon.alpha -= 0.3;
+			if (ccPanel != null)
+			{
+				ccPanel.alpha -= 0.3;
+				ccIcon.alpha -= 0.3;
+			}
 
 			for (i in 0...CCTXT.members.length)
 			{
 				CCTXT.members[i].alpha -= 0.3;
 
 				if (CCTXT.members[i].alpha == 0)
-					CCTXT.members[i].visible = false;
+					CCTXT.members[i].alpha = 0;
 			}
 
 			if (ccPanel.alpha == 0)
 			{
-				ccPanel.visible = false;
-				ccIcon.visible = false;
+				ccPanel.alpha = 0;
+				ccIcon.alpha = 0;
+				remove(ccPanel);
+				remove(ccIcon);
+				remove(CCTXT);
 				tmr.destroy();
 			}
 		});
 
-		new FlxTimer().start(10.2, function(tmr:FlxTimer)
+		new FlxTimer().start(10.5, function(tmr:FlxTimer)
 		{
 			tmr.destroy();
-			// TODO: IMPLEMENT CODE TO SHOW A REGIONAL CONDITION PRODUCT
 		});
 
 		new FlxTimer().start(20, function(tmr:FlxTimer)
 		{
-			ccTitle.alpha -= 0.3;
+			if (ccTitle != null)
+				ccTitle.alpha -= 0.3;
 
 			if (ccTitle.alpha == 0)
 			{
-				ccTitle.visible = false;
+				remove(ccTitle);
 				tmr.destroy();
 			}
 		});
 
-		new FlxTimer().start(20.2, function(tmr:FlxTimer)
+		new FlxTimer().start(20.5, function(tmr:FlxTimer)
 		{
-			rrTitle.alpha += 0.1;
-
-			// TODO: ADD CODE FOR SHOWING RADAR IMAGES
+			if (rrTitle != null)
+				rrTitle.alpha += 0.1;
 
 			if (rrTitle.alpha >= 1)
+			{
+				rrTitle.alpha = 1;
 				tmr.destroy();
+			}
 		});
 
 		new FlxTimer().start(25, function(tmr:FlxTimer)
 		{
-			rrTitle.alpha -= 0.3;
+			if (rrTitle != null)
+				rrTitle.alpha -= 0.3;
 
 			if (rrTitle.alpha == 0)
 			{
+				remove(rrTitle);
 				tmr.destroy();
-				rrTitle.visible = false;
 			}
-		});
 
-		new FlxTimer().start(25.2, function(tmr:FlxTimer)
-		{
-			lrTitle.alpha += 0.1;
-
-			if (lrTitle.alpha >= 1)
-				tmr.destroy();
-		});
-
-		new FlxTimer().start(35, function(tmr:FlxTimer)
-		{
-			lrTitle.alpha -= 0.3;
-
-			if (lrTitle.alpha == 0)
+			new FlxTimer().start(0.5, function(tmr:FlxTimer)
 			{
-				lrTitle.visible = false;
-				tmr.destroy();
-			}
+				if (drTitle != null)
+					drTitle.alpha += 0.1;
+
+				if (drTitle.alpha >= 1)
+				{
+					drTitle.alpha = 1;
+					tmr.destroy();
+				}
+			});
 		});
 
 		new FlxTimer().start(35, function(tmr:FlxTimer)
 		{
-			drTitle.alpha += 0.1;
-
-			if (drTitle.alpha >= 1)
-				tmr.destroy();
-		});
-
-		new FlxTimer().start(45, function(tmr:FlxTimer)
-		{
-			drTitle.alpha -= 0.3;
+			if (drTitle != null)
+				drTitle.alpha -= 0.3;
 
 			if (drTitle.alpha == 0)
 			{
-				drTitle.visible = false;
+				remove(drTitle);
 				tmr.destroy();
+			}
+
+			new FlxTimer().start(0.5, function(tmr:FlxTimer)
+			{
+				lfTitle.alpha += 0.1;
+				lfPanel.alpha += 0.1;
+				lf_cityName.alpha += 0.1;
+
+				if (lfTitle.alpha >= 1)
+				{
+					lfTitle.alpha = 1;
+					lfPanel.alpha = 1;
+					lf_cityName.alpha = 1;
+					tmr.destroy();
+				}
+			});
+		});
+
+		// Local forecast switch
+
+		new FlxTimer().start(35.5, function(tmr:FlxTimer)
+		{
+			if (DOWTXT.members[0] != null)
+			{
+				DOWTXT.members[0].alpha += 0.1;
+				NARRATIVES.members[0].alpha += 0.1;
+
+				if (DOWTXT.members[0].alpha >= 1)
+				{
+					DOWTXT.members[0].alpha = 1;
+					NARRATIVES.members[0].alpha = 1;
+					tmr.destroy();
+				}
 			}
 		});
 
-		new FlxTimer().start(45.2, function(tmr:FlxTimer)
+		// Is creating a bunch of timers a bad peformance idea?
+		// Guess we'll have to wait and see!
+
+		/* 
+			For some reason, the FPS just crashes around this area and I'm not entirely sure why? 
+			It's quite odd, but for some reason during the LF segment it will just steadily go down from
+			60fps to 45 to 30fps at worst.
+
+			I'm 100% sure it's not some sort of weird memory leak. I've tried recompiling several times and it seems the memory
+			usage goes nowhere past around 125MB, which is more than ideal. Maybe this is just an issue with OpenFL/Flixel??
+
+			I'll probably just ask the OpenFL/Haxe Discord and see if they can find anything wrong with my code here.
+			Worst case scenario I'll have to go ahead and switch to stock OpenFl, but honestly that would be a shitty
+			move to make since 90% of the engine is already written.
+
+			(10/16/2021); Zeexel
+		 */
+
+		new FlxTimer().start(47, function(tmr:FlxTimer)
 		{
-			// We can make multiple FlxTimers in this, which makes switching between the local forecast pretty easy
-
-			lfTitle.alpha += 0.1;
-			lfPanel.alpha += 0.1;
-			DOWTXT.members[0].alpha += 0.1;
-			NARRATIVES.members[0].alpha += 0.1;
-
-			for (i in 0...LFTXT.members.length)
-			{
-				LFTXT.members[i].alpha += 0.1;
-
-				if (LFTXT.members[i].alpha >= 1)
-					LFTXT.members[i].alpha = 1;
-			}
-
-			if (lfPanel.alpha >= 1)
-			{
-				lfTitle.alpha = 1;
-				lfPanel.alpha = 1;
-			}
-
-			if (DOWTXT.members[0].alpha >= 1)
-			{
-				DOWTXT.members[0].alpha = 1;
-				NARRATIVES.members[0].alpha = 1;
-			}
-
-			// Switch between all of the forecasts.
-			// This only uses 5 forecasts because there's unfortunately no options for just doing
-			// an actual 36-hour forecast (1 1/2 days)
-			new FlxTimer().start(12, function(tmr:FlxTimer)
+			if (DOWTXT.members[0] != null)
 			{
 				DOWTXT.members[0].alpha -= 0.3;
 				NARRATIVES.members[0].alpha -= 0.3;
 
-				if (NARRATIVES.members[0].alpha == 0)
+				if (DOWTXT.members[0].alpha == 0)
 				{
-					DOWTXT.members[0].visible = false;
-					NARRATIVES.members[0].visible = false;
-					tmr.destroy();
+					DOWTXT.remove(DOWTXT.members[0]);
+					NARRATIVES.remove(NARRATIVES.members[0]);
 				}
-			});
+			}
 
-			new FlxTimer().start(12.2, function(tmr:FlxTimer)
+			if (DOWTXT.members[1] != null)
 			{
 				DOWTXT.members[1].alpha += 0.1;
 				NARRATIVES.members[1].alpha += 0.1;
 
-				if (NARRATIVES.members[1].alpha >= 1)
+				if (DOWTXT.members[1].alpha >= 1)
 				{
 					DOWTXT.members[1].alpha = 1;
 					NARRATIVES.members[1].alpha = 1;
-
 					tmr.destroy();
+				}
+			}
+
+			new FlxTimer().start(12, function(tmr:FlxTimer)
+			{
+				if (DOWTXT.members[1] != null)
+				{
+					DOWTXT.members[1].alpha -= 0.3;
+					NARRATIVES.members[1].alpha -= 0.3;
+
+					if (DOWTXT.members[1].alpha == 0)
+					{
+						DOWTXT.remove(DOWTXT.members[1]);
+						NARRATIVES.remove(NARRATIVES.members[1]);
+					}
+				}
+
+				if (DOWTXT.members[2] != null)
+				{
+					DOWTXT.members[2].alpha += 0.1;
+					NARRATIVES.members[2].alpha += 0.1;
+
+					if (DOWTXT.members[2].alpha >= 1)
+					{
+						DOWTXT.members[2].alpha = 1;
+						NARRATIVES.members[2].alpha = 1;
+						tmr.destroy();
+					}
 				}
 			});
 
 			new FlxTimer().start(24, function(tmr:FlxTimer)
 			{
-				DOWTXT.members[1].alpha -= 0.3;
-				NARRATIVES.members[1].alpha -= 0.3;
-
-				if (NARRATIVES.members[1].alpha == 0)
+				if (DOWTXT.members[2] != null)
 				{
-					DOWTXT.members[1].visible = false;
-					NARRATIVES.members[1].visible = false;
-					tmr.destroy();
+					DOWTXT.members[2].alpha -= 0.3;
+					NARRATIVES.members[2].alpha -= 0.3;
+
+					if (DOWTXT.members[2].alpha == 0)
+					{
+						DOWTXT.remove(DOWTXT.members[2]);
+						NARRATIVES.remove(NARRATIVES.members[2]);
+					}
+				}
+
+				if (DOWTXT.members[3] != null)
+				{
+					DOWTXT.members[3].alpha += 0.1;
+					NARRATIVES.members[3].alpha += 0.1;
+
+					if (DOWTXT.members[3].alpha >= 1)
+					{
+						DOWTXT.members[3].alpha = 1;
+						NARRATIVES.members[3].alpha = 1;
+						tmr.destroy();
+					}
 				}
 			});
+		});
 
-			new FlxTimer().start(24.2, function(tmr:FlxTimer)
-			{
-				DOWTXT.members[2].alpha += 0.1;
-				NARRATIVES.members[2].alpha += 0.1;
-
-				if (NARRATIVES.members[2].alpha >= 1)
-				{
-					DOWTXT.members[2].alpha = 1;
-					NARRATIVES.members[2].alpha = 1;
-
-					tmr.destroy();
-				}
-			});
-
-			new FlxTimer().start(36, function(tmr:FlxTimer)
-			{
-				DOWTXT.members[2].alpha -= 0.3;
-				NARRATIVES.members[2].alpha -= 0.3;
-
-				if (NARRATIVES.members[2].alpha == 0)
-				{
-					DOWTXT.members[2].visible = false;
-					NARRATIVES.members[2].visible = false;
-					tmr.destroy();
-				}
-			});
-
-			new FlxTimer().start(36.2, function(tmr:FlxTimer)
-			{
-				DOWTXT.members[3].alpha += 0.1;
-				NARRATIVES.members[3].alpha += 0.1;
-
-				if (NARRATIVES.members[3].alpha >= 1)
-				{
-					DOWTXT.members[3].alpha = 1;
-					NARRATIVES.members[3].alpha = 1;
-
-					tmr.destroy();
-				}
-			});
-
-			new FlxTimer().start(48, function(tmr:FlxTimer)
+		new FlxTimer().start(83, function(tmr:FlxTimer) // FPS drop around here??
+		{
+			if (DOWTXT.members[3] != null)
 			{
 				DOWTXT.members[3].alpha -= 0.3;
 				NARRATIVES.members[3].alpha -= 0.3;
 
-				if (NARRATIVES.members[3].alpha == 0)
+				if (DOWTXT.members[3].alpha == 0)
 				{
-					DOWTXT.members[3].visible = false;
-					NARRATIVES.members[3].visible = false;
-					tmr.destroy();
+					DOWTXT.remove(DOWTXT.members[3]);
+					NARRATIVES.remove(NARRATIVES.members[3]);
 				}
-			});
+			}
 
-			new FlxTimer().start(48.2, function(tmr:FlxTimer)
+			if (DOWTXT.members[4] != null)
 			{
 				DOWTXT.members[4].alpha += 0.1;
 				NARRATIVES.members[4].alpha += 0.1;
 
-				if (NARRATIVES.members[4].alpha >= 1)
+				if (DOWTXT.members[4].alpha >= 1)
 				{
 					DOWTXT.members[4].alpha = 1;
 					NARRATIVES.members[4].alpha = 1;
-
 					tmr.destroy();
 				}
+			}
+
+			new FlxTimer().start(12, function(tmr:FlxTimer)
+			{
+				if (DOWTXT.members[4] != null)
+				{
+					DOWTXT.members[4].alpha -= 0.3;
+					NARRATIVES.members[4].alpha -= 0.3;
+
+					if (DOWTXT.members[4].alpha == 0)
+					{
+						DOWTXT.remove(DOWTXT.members[4]);
+						NARRATIVES.remove(NARRATIVES.members[4]);
+					}
+				}
+
+				if (DOWTXT.members[5] != null)
+				{
+					DOWTXT.members[5].alpha += 0.1;
+					NARRATIVES.members[5].alpha += 0.1;
+
+					if (DOWTXT.members[5].alpha >= 1)
+					{
+						DOWTXT.members[5].alpha = 1;
+						NARRATIVES.members[5].alpha = 1;
+						tmr.destroy();
+					}
+				}
 			});
+		});
+
+		new FlxTimer().start(100, function(tmr:FlxTimer)
+		{
+			if (lfTitle != null)
+			{
+				lfTitle.alpha -= 0.3;
+				lfPanel.alpha -= 0.3;
+				lf_cityName.alpha -= 0.3;
+			}
+
+			if (DOWTXT.members[5] != null)
+			{
+				DOWTXT.members[5].alpha -= 0.3;
+				NARRATIVES.members[5].alpha -= 0.3;
+			}
+
+			if (lfTitle.alpha == 0)
+			{
+				remove(lfTitle);
+				remove(lfPanel);
+				remove(lf_cityName);
+				remove(DOWTXT);
+				remove(NARRATIVES);
+				tmr.destroy();
+			}
 		});
 
 		super.update(elapsed);

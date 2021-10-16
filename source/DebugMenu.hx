@@ -34,6 +34,9 @@ class DebugMenu extends FlxState
 	{
 		FlxG.autoPause = false;
 		initSettings(); // Do this so we can actually change values.
+		// APIHandler.apiSetup();
+		// APIHandler.getLocationData();
+		// APIHandler.getMap();
 
 		_lfBtn = new FlxButton(0, FlxG.height - 40, null, loadLF);
 		_lfBtn.scale.x = 1.5;

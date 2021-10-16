@@ -1,8 +1,19 @@
 package;
 
 import flixel.FlxG;
+import flixel.system.FlxAssets;
 import haxe.Json;
+import haxe.io.Bytes;
+import haxe.io.Encoding;
+import openfl.events.Event;
+import openfl.net.URLLoader;
+import openfl.net.URLLoaderDataFormat;
+import openfl.net.URLRequest;
 import sys.Http;
+import sys.io.File;
+import sys.io.FileOutput;
+
+using StringTools;
 
 // types
 typedef LOCATIONDATA =
@@ -36,9 +47,11 @@ typedef FORECASTDATA =
 class APIHandler
 {
 	private static var APIKey:String;
-	static var units:String;
-	static var areaCode:String;
-	static var lang:String;
+	private static var APIKey_Mapbox:String;
+	private static var units:String;
+	private static var areaCode:String;
+	private static var lang:String;
+	private static var MapboxStyle:String;
 
 	// types
 	public static var _CCVARS:CCVARS;
@@ -50,9 +63,13 @@ class APIHandler
 	{
 		OSSettings.initSave();
 		APIKey = FlxG.save.data.apiKey;
+		APIKey_Mapbox = FlxG.save.data.mapboxKey;
+		MapboxStyle = FlxG.save.data.mapStyle;
 		units = FlxG.save.data.units;
 		areaCode = FlxG.save.data.areaCode;
 		lang = FlxG.save.data.lang;
+
+		getLocationData(); // Do this so we dont ave to run it in MainState;
 	}
 
 	// https://weather.com/swagger-docs/ui/sun/v3/sunV3LocationSearch.json
@@ -187,4 +204,21 @@ class APIHandler
 	// area.
 	// [API LINK]
 	public static function getRegionalCC():Void {}
+
+	// Pulls from MapBox to get the base map for Radar and whatnot.
+	// downloads as a 2560x1440 image instead of 1280x720.
+	// TODO: Rebuild the asset library for assets/images after this function is ran!!
+	public static function getMap():Void
+	{
+		trace("DOWNLOADING MAP DATA");
+		var l:URLLoader = new URLLoader();
+		l.dataFormat = URLLoaderDataFormat.BINARY;
+		l.addEventListener(Event.COMPLETE, function(e:Event)
+		{
+			var path:String = 'assets/images/radar/map.png';
+			File.saveBytes(path, l.data);
+			trace("Downloaded a map that was " + l.data.length + " bytes.");
+		});
+		l.load(new URLRequest('https://api.mapbox.com/styles/v1/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc/static/${_LOCATIONDATA.long},${_LOCATIONDATA.lat},8.43,0,1/1280x720@2x?access_token=pk.eyJ1IjoiemVleGVsMzIiLCJhIjoiY2tzemU0M2o5MHl3ODJwcWl2YjhxbnRxOCJ9.don8TkevF9UuD_v11OPKiw'));
+	}
 }

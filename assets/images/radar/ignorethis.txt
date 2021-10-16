@@ -1,0 +1,2 @@
+For whatever reason, haxe wont fucking compile the radar folder without this being here. So, take this.
+June.

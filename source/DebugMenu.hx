@@ -33,6 +33,9 @@ class DebugMenu extends FlxState
 	override public function create():Void
 	{
 		FlxG.autoPause = false;
+		FlxG.sound.muteKeys = null;
+		FlxG.sound.volumeDownKeys = null;
+		FlxG.sound.volumeUpKeys = null;
 		initSettings(); // Do this so we can actually change values.
 		// APIHandler.apiSetup();
 		// APIHandler.getLocationData();
@@ -43,6 +46,8 @@ class DebugMenu extends FlxState
 		_lfBtn.scale.y = 1.5;
 		_lfBtn.updateHitbox();
 		add(_lfBtn);
+
+		// bgColor = 0xFFFF00FF;
 
 		// Text boxes
 		areaCodeBox = new FlxInputText(0, 30, 200, '${FlxG.save.data.areaCode}', 15);

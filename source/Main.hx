@@ -15,6 +15,7 @@ class Main extends Sprite
 	var skipSplash:Bool = true;
 	var startFullscreen:Bool = false;
 
+	// Disable default HaxeFlixel volume control
 	public function new()
 	{
 		super();

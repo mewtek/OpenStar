@@ -30,6 +30,9 @@ class MainState extends FlxState
 	private var OS_DEBUG:Bool;
 	private var activeAlert:Bool;
 
+	// General graphics
+	private var BG:FlxSprite;
+
 	// Panels
 	private var ccPanel:FlxSprite;
 	private var lfPanel:FlxSprite;
@@ -88,10 +91,29 @@ class MainState extends FlxState
 	// Maps
 	private var map:FlxSprite;
 
+	// LOT8 Slide bools
+	private var CC:Bool;
+	private var CCFO:Bool;
+	private var RR:Bool;
+	private var DR:Bool;
+	private var TWA:Bool;
+	private var finished:Bool;
+
+	// this is a stupid way of doing this lmao
+	private var LF:Bool;
+	private var LF_0:Bool;
+	private var LF_1:Bool;
+	private var LF_2:Bool;
+	private var LF_3:Bool;
+	private var LF_4:Bool;
+
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
 		FlxG.autoPause = false; // Disable the program pausing when the window is out of focus
+		FlxG.sound.muteKeys = null;
+		FlxG.sound.volumeDownKeys = null;
+		FlxG.sound.volumeUpKeys = null;
 
 		// get information from IBM
 		APIHandler.apiSetup();
@@ -109,16 +131,18 @@ class MainState extends FlxState
 		{
 			FlxG.debugger.drawDebug = true;
 			// vv Basically the WeatherSTAR 4000 BG gradient, a bit easier to see draw boxes with
-			var bg:FlxSprite = FlxGradient.createGradientFlxSprite(1920, 1080, [FlxColor.fromString('0x1d0255'), FlxColor.fromString('0xba5c13')], 1, 90);
-			add(bg);
+			BG = FlxGradient.createGradientFlxSprite(1920, 1080, [FlxColor.fromString('0x1d0255'), FlxColor.fromString('0xba5c13')], 1, 90);
+			add(BG);
 		}
 		else
 		{
-			var bg:FlxSprite = new FlxSprite().loadGraphic('assets/images/Backgrounds/Background-Normal.png');
-			bg.screenCenter();
-			bg.antialiasing = false;
-			add(bg);
+			BG = new FlxSprite().loadGraphic('assets/images/Backgrounds/Background-Normal.png');
+			BG.screenCenter();
+			BG.antialiasing = false;
+			add(BG);
 		}
+
+		bgColor = 0x0047bb;
 
 		makeMusicPL();
 		if (FlxG.sound.music == null)
@@ -386,7 +410,7 @@ class MainState extends FlxState
 		LOCALVOCAL_INTRO = FlxG.sound.load(Resources.narration("CC_INTRO1", null), 1.0, false, null, false, false, null, () -> LOCALVOCAL_TMP.play());
 		LOCALVOCAL_TMP = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.temperature}', "temperatures"), 1.0, false, null, false, false, null,
 			() -> LOCALVOCAL_CC.play());
-		LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions")); // Don't ask.
+		LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions"));
 
 		/*
 			I genuinely don't know why, but for some god-forsaken reason,
@@ -398,6 +422,8 @@ class MainState extends FlxState
 		{
 			LOCALVOCAL_INTRO.play();
 		});
+
+		createLOT8timers();
 	}
 
 	function makeMusicPL():Array<String>
@@ -420,13 +446,39 @@ class MainState extends FlxState
 		return music_playlist;
 	}
 
+	function createLOT8timers():Void
+	{
+		new FlxTimer().start(0.5, timer -> CC = true); // Current Conditions
+		new FlxTimer().start(10, timer -> CCFO = true); // Current Conditions Fade Out
+		new FlxTimer().start(15, timer -> RR = true); // Regional Radar
+		new FlxTimer().start(20, timer -> DR = true); // Doppler Radar
+		new FlxTimer().start(30, timer -> LF = true);
+
+		// Local Forecast Text switching
+		// I'm aware of how messy this is, but this is legit something that needs to be done so I can
+		// avoid the FPS going to hell.
+		// ^^ see https://github.com/Zeexel/OpenStar/commit/59891df5683bdd80707f6fd9d7f95c1b88ccf907 line 590.
+
+		new FlxTimer().start(30.5, timer -> LF_0 = true);
+		new FlxTimer().start(40, timer -> LF_1 = true);
+		new FlxTimer().start(50, timer -> LF_2 = true);
+		new FlxTimer().start(60, timer -> LF_3 = true);
+		new FlxTimer().start(70, timer -> LF_4 = true);
+
+		// Back to panels, then we're done!
+		new FlxTimer().start(80, timer -> TWA = true);
+		new FlxTimer().start(95, timer -> finished = true);
+	}
+
 	// Everything in this function will be called every frame
 	// Remember to destroy your timers!
 	override public function update(elapsed):Void
 	{
 		// Lower audio when any of the local vocals are playing
-		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing)
+		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
 			FlxG.sound.music.volume = 0.1;
+		else if (FlxG.sound.music == null)
+			trace("NO MUSIC");
 		else
 			FlxG.sound.music.volume = 0.8;
 
@@ -434,17 +486,15 @@ class MainState extends FlxState
 		// trace(DateTools.format(Date.now(), "%I:%M"));
 		timeTicker.text = DateTools.format(Date.now(), "%I:%M");
 
-		// Fade in current conditions
-		new FlxTimer().start(0.5, function(tmr:FlxTimer)
+		// LOT8
+		// Current Conditions
+		if (CC == true)
 		{
-			if (ccPanel != null)
-			{
-				ccPanel.alpha += 0.1;
-				ccTitle.alpha += 0.1;
-				ccIcon.alpha += 0.1;
-			}
+			trace("CC IS TRUE!!!");
+			ccPanel.alpha += 0.1;
+			ccTitle.alpha += 0.1;
+			ccIcon.alpha += 0.1;
 
-			// Fade in text
 			for (i in 0...CCTXT.members.length)
 			{
 				CCTXT.members[i].alpha += 0.1;
@@ -453,159 +503,107 @@ class MainState extends FlxState
 					CCTXT.members[i].alpha = 1;
 			}
 
-			if (ccPanel.alpha >= 1) // Going to full alpha should sync with everything else, use the panel as a baseline
+			if (ccPanel.alpha >= 1)
 			{
 				ccPanel.alpha = 1;
-				ccIcon.alpha = 1;
 				ccTitle.alpha = 1;
-				tmr.destroy();
+				ccIcon.alpha = 1;
+				CC = false;
 			}
-		}, 1);
+		}
 
-		new FlxTimer().start(10, function(tmr:FlxTimer)
+		// Current Conditions Fadeout
+		if (CCFO == true)
 		{
-			if (ccPanel != null)
-			{
-				ccPanel.alpha -= 0.3;
-				ccIcon.alpha -= 0.3;
-			}
+			trace("FADING OUT OF CURRENT CONDITIONS");
+
+			ccPanel.alpha -= 0.3;
+			ccIcon.alpha -= 0.3;
 
 			for (i in 0...CCTXT.members.length)
 			{
 				CCTXT.members[i].alpha -= 0.3;
 
 				if (CCTXT.members[i].alpha == 0)
-					CCTXT.members[i].alpha = 0;
+					remove(CCTXT);
 			}
 
 			if (ccPanel.alpha == 0)
 			{
-				ccPanel.alpha = 0;
-				ccIcon.alpha = 0;
 				remove(ccPanel);
 				remove(ccIcon);
-				remove(CCTXT);
-				tmr.destroy();
+				CCFO = false;
 			}
-		});
+		}
 
-		new FlxTimer().start(10.5, function(tmr:FlxTimer)
+		// Regional Radar
+		if (RR == true)
 		{
-			tmr.destroy();
-		});
-
-		new FlxTimer().start(20, function(tmr:FlxTimer)
-		{
-			if (ccTitle != null)
-				ccTitle.alpha -= 0.3;
+			trace("REGIONAL RADAR");
+			rrTitle.alpha += 0.1;
+			ccTitle.alpha -= 0.3;
 
 			if (ccTitle.alpha == 0)
-			{
 				remove(ccTitle);
-				tmr.destroy();
-			}
-		});
-
-		new FlxTimer().start(20.5, function(tmr:FlxTimer)
-		{
-			if (rrTitle != null)
-				rrTitle.alpha += 0.1;
 
 			if (rrTitle.alpha >= 1)
 			{
 				rrTitle.alpha = 1;
-				tmr.destroy();
+				RR = false;
 			}
-		});
-
-		new FlxTimer().start(25, function(tmr:FlxTimer)
+		}
+		// Doppler Radar
+		if (DR == true)
 		{
-			if (rrTitle != null)
-				rrTitle.alpha -= 0.3;
+			trace("DOPPLER RADAR FADE IN");
+
+			drTitle.alpha += 0.1;
+			rrTitle.alpha -= 0.1;
 
 			if (rrTitle.alpha == 0)
 			{
 				remove(rrTitle);
-				tmr.destroy();
 			}
 
-			new FlxTimer().start(0.5, function(tmr:FlxTimer)
+			if (drTitle.alpha >= 1)
 			{
-				if (drTitle != null)
-					drTitle.alpha += 0.1;
+				drTitle.alpha = 1;
+				DR = false;
+			}
+		}
 
-				if (drTitle.alpha >= 1)
-				{
-					drTitle.alpha = 1;
-					tmr.destroy();
-				}
-			});
-		});
-
-		new FlxTimer().start(35, function(tmr:FlxTimer)
+		// LOCAL FORECAST
+		if (LF == true)
 		{
-			if (drTitle != null)
-				drTitle.alpha -= 0.3;
+			lfTitle.alpha += 0.1;
+			lfPanel.alpha += 0.1;
+			lf_cityName.alpha += 0.1;
+			drTitle.alpha -= 0.3;
 
 			if (drTitle.alpha == 0)
 			{
 				remove(drTitle);
-				tmr.destroy();
 			}
 
-			new FlxTimer().start(0.5, function(tmr:FlxTimer)
+			if (lfTitle.alpha >= 1)
 			{
-				lfTitle.alpha += 0.1;
-				lfPanel.alpha += 0.1;
-				lf_cityName.alpha += 0.1;
+				lfTitle.alpha = 1;
+				lfPanel.alpha = 1;
+				lf_cityName.alpha = 1;
+				LF = false;
+			}
+		}
 
-				if (lfTitle.alpha >= 1)
-				{
-					lfTitle.alpha = 1;
-					lfPanel.alpha = 1;
-					lf_cityName.alpha = 1;
-					tmr.destroy();
-				}
-			});
-		});
-
-		// Local forecast switch
-
-		new FlxTimer().start(35.5, function(tmr:FlxTimer)
+		if (LF_0 == true)
 		{
-			if (DOWTXT.members[0] != null)
-			{
-				DOWTXT.members[0].alpha += 0.1;
-				NARRATIVES.members[0].alpha += 0.1;
+			DOWTXT.members[0].alpha += 0.1;
+			NARRATIVES.members[0].alpha += 0.1;
 
-				if (DOWTXT.members[0].alpha >= 1)
-				{
-					DOWTXT.members[0].alpha = 1;
-					NARRATIVES.members[0].alpha = 1;
-					tmr.destroy();
-				}
-			}
-		});
+			if (DOWTXT.members[0].alpha >= 1)
+				LF_0 = false;
+		}
 
-		// Is creating a bunch of timers a bad peformance idea?
-		// Guess we'll have to wait and see!
-
-		/* 
-			For some reason, the FPS just crashes around this area and I'm not entirely sure why? 
-			It's quite odd, but for some reason during the LF segment it will just steadily go down from
-			60fps to 45 to 30fps at worst.
-
-			I'm 100% sure it's not some sort of weird memory leak. I've tried recompiling several times and it seems the memory
-			usage goes nowhere past around 125MB, which is more than ideal. Maybe this is just an issue with OpenFL/Flixel??
-
-			I'll probably just ask the OpenFL/Haxe Discord and see if they can find anything wrong with my code here.
-			Worst case scenario I'll have to go ahead and switch to stock OpenFl, but honestly that would be a shitty
-			move to make since 90% of the engine is already written.
-
-			(10/16/2021); Zeexel
-		 */
-
-		new FlxTimer().start(47, function(tmr:FlxTimer)
+		if (LF_1 == true)
 		{
 			if (DOWTXT.members[0] != null)
 			{
@@ -619,77 +617,56 @@ class MainState extends FlxState
 				}
 			}
 
+			DOWTXT.members[1].alpha += 0.1;
+			NARRATIVES.members[1].alpha += 0.1;
+
+			if (DOWTXT.members[1].alpha >= 1)
+				LF_1 = false;
+		}
+
+		if (LF_2 == true)
+		{
 			if (DOWTXT.members[1] != null)
 			{
-				DOWTXT.members[1].alpha += 0.1;
-				NARRATIVES.members[1].alpha += 0.1;
+				DOWTXT.members[1].alpha -= 0.3;
+				NARRATIVES.members[1].alpha -= 0.3;
 
-				if (DOWTXT.members[1].alpha >= 1)
+				if (DOWTXT.members[1].alpha == 0)
 				{
-					DOWTXT.members[1].alpha = 1;
-					NARRATIVES.members[1].alpha = 1;
-					tmr.destroy();
+					DOWTXT.remove(DOWTXT.members[1]);
+					NARRATIVES.remove(NARRATIVES.members[1]);
 				}
 			}
 
-			new FlxTimer().start(12, function(tmr:FlxTimer)
+			DOWTXT.members[2].alpha += 0.1;
+			NARRATIVES.members[2].alpha += 0.1;
+
+			if (DOWTXT.members[2].alpha >= 1)
+				LF_2 = false;
+		}
+
+		if (LF_3 == true)
+		{
+			if (DOWTXT.members[2] != null)
 			{
-				if (DOWTXT.members[1] != null)
+				DOWTXT.members[2].alpha -= 0.3;
+				NARRATIVES.members[2].alpha -= 0.3;
+
+				if (DOWTXT.members[2].alpha == 0)
 				{
-					DOWTXT.members[1].alpha -= 0.3;
-					NARRATIVES.members[1].alpha -= 0.3;
-
-					if (DOWTXT.members[1].alpha == 0)
-					{
-						DOWTXT.remove(DOWTXT.members[1]);
-						NARRATIVES.remove(NARRATIVES.members[1]);
-					}
+					DOWTXT.remove(DOWTXT.members[2]);
+					NARRATIVES.remove(NARRATIVES.members[2]);
 				}
+			}
 
-				if (DOWTXT.members[2] != null)
-				{
-					DOWTXT.members[2].alpha += 0.1;
-					NARRATIVES.members[2].alpha += 0.1;
+			DOWTXT.members[3].alpha += 0.1;
+			NARRATIVES.members[3].alpha += 0.1;
 
-					if (DOWTXT.members[2].alpha >= 1)
-					{
-						DOWTXT.members[2].alpha = 1;
-						NARRATIVES.members[2].alpha = 1;
-						tmr.destroy();
-					}
-				}
-			});
+			if (DOWTXT.members[3].alpha >= 1)
+				LF_3 = false;
+		}
 
-			new FlxTimer().start(24, function(tmr:FlxTimer)
-			{
-				if (DOWTXT.members[2] != null)
-				{
-					DOWTXT.members[2].alpha -= 0.3;
-					NARRATIVES.members[2].alpha -= 0.3;
-
-					if (DOWTXT.members[2].alpha == 0)
-					{
-						DOWTXT.remove(DOWTXT.members[2]);
-						NARRATIVES.remove(NARRATIVES.members[2]);
-					}
-				}
-
-				if (DOWTXT.members[3] != null)
-				{
-					DOWTXT.members[3].alpha += 0.1;
-					NARRATIVES.members[3].alpha += 0.1;
-
-					if (DOWTXT.members[3].alpha >= 1)
-					{
-						DOWTXT.members[3].alpha = 1;
-						NARRATIVES.members[3].alpha = 1;
-						tmr.destroy();
-					}
-				}
-			});
-		});
-
-		new FlxTimer().start(83, function(tmr:FlxTimer) // FPS drop around here??
+		if (LF_4 == true)
 		{
 			if (DOWTXT.members[3] != null)
 			{
@@ -703,73 +680,59 @@ class MainState extends FlxState
 				}
 			}
 
+			DOWTXT.members[4].alpha += 0.1;
+			NARRATIVES.members[4].alpha += 0.1;
+
+			if (DOWTXT.members[4].alpha >= 1)
+				LF_4 = false;
+		}
+
+		// The Week Ahead!
+		if (TWA == true)
+		{
 			if (DOWTXT.members[4] != null)
 			{
-				DOWTXT.members[4].alpha += 0.1;
-				NARRATIVES.members[4].alpha += 0.1;
-
-				if (DOWTXT.members[4].alpha >= 1)
-				{
-					DOWTXT.members[4].alpha = 1;
-					NARRATIVES.members[4].alpha = 1;
-					tmr.destroy();
-				}
-			}
-
-			new FlxTimer().start(12, function(tmr:FlxTimer)
-			{
-				if (DOWTXT.members[4] != null)
-				{
-					DOWTXT.members[4].alpha -= 0.3;
-					NARRATIVES.members[4].alpha -= 0.3;
-
-					if (DOWTXT.members[4].alpha == 0)
-					{
-						DOWTXT.remove(DOWTXT.members[4]);
-						NARRATIVES.remove(NARRATIVES.members[4]);
-					}
-				}
-
-				if (DOWTXT.members[5] != null)
-				{
-					DOWTXT.members[5].alpha += 0.1;
-					NARRATIVES.members[5].alpha += 0.1;
-
-					if (DOWTXT.members[5].alpha >= 1)
-					{
-						DOWTXT.members[5].alpha = 1;
-						NARRATIVES.members[5].alpha = 1;
-						tmr.destroy();
-					}
-				}
-			});
-		});
-
-		new FlxTimer().start(100, function(tmr:FlxTimer)
-		{
-			if (lfTitle != null)
-			{
+				DOWTXT.members[4].alpha -= 0.3;
+				NARRATIVES.members[4].alpha -= 0.3;
 				lfTitle.alpha -= 0.3;
 				lfPanel.alpha -= 0.3;
-				lf_cityName.alpha -= 0.3;
+
+				if (DOWTXT.members[4].alpha == 0)
+				{
+					remove(DOWTXT);
+					remove(NARRATIVES);
+					remove(lfTitle);
+					remove(lfPanel);
+				}
 			}
 
-			if (DOWTXT.members[5] != null)
-			{
-				DOWTXT.members[5].alpha -= 0.3;
-				NARRATIVES.members[5].alpha -= 0.3;
-			}
+			twaPanel.alpha += 0.1;
+			twaTitle.alpha += 0.1;
 
-			if (lfTitle.alpha == 0)
+			// TODO: 7-Day Outlook code
+
+			if (twaTitle.alpha >= 1)
+				TWA = false;
+		}
+
+		// Clean up and GTFO
+		if (finished == true)
+		{
+			// Fade out entirely.
+			twaPanel.alpha -= 0.3;
+			twaTitle.alpha -= 0.3;
+			lf_cityName.alpha -= 0.3;
+			BG.alpha -= 0.3;
+			if (BG.alpha == 0)
 			{
-				remove(lfTitle);
-				remove(lfPanel);
+				remove(BG);
 				remove(lf_cityName);
-				remove(DOWTXT);
-				remove(NARRATIVES);
-				tmr.destroy();
+				remove(twaPanel);
+				remove(twaTitle);
+				FlxG.sound.music.volume = 0;
+				FlxG.switchState(new DebugMenu());
 			}
-		});
+		}
 
 		super.update(elapsed);
 	}

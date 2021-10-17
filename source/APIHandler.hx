@@ -23,6 +23,7 @@ typedef LOCATIONDATA =
 	// Used for forecast and other data
 	var lat:Float;
 	var long:Float;
+	var zone:String;
 }
 
 typedef CCVARS =
@@ -87,7 +88,8 @@ class APIHandler
 				cityName: res.location.displayName,
 				zoneID: res.location.zoneId,
 				lat: res.location.latitude,
-				long: res.location.longitude
+				long: res.location.longitude,
+				zone: res.location.zoneId
 			};
 
 			trace(res.location.latitude);

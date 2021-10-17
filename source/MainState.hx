@@ -477,8 +477,6 @@ class MainState extends FlxState
 		// Lower audio when any of the local vocals are playing
 		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
 			FlxG.sound.music.volume = 0.1;
-		else if (FlxG.sound.music == null)
-			trace("NO MUSIC");
 		else
 			FlxG.sound.music.volume = 0.8;
 
@@ -730,7 +728,7 @@ class MainState extends FlxState
 				remove(twaPanel);
 				remove(twaTitle);
 				FlxG.sound.music.volume = 0;
-				FlxG.switchState(new DebugMenu());
+				FlxG.switchState(new BroadcastState());
 			}
 		}
 

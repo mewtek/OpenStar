@@ -418,12 +418,12 @@ class MainState extends FlxState
 			do anything besides completely ignoring the onComplete() function that's done when
 			these are all loaded into the state.
 		 */
-		new FlxTimer().start(1, function(tmr:FlxTimer)
+		new FlxTimer().start(0.2, function(tmr:FlxTimer)
 		{
 			LOCALVOCAL_INTRO.play();
 		});
 
-		createLOT8timers();
+		createPresentationTimers();
 	}
 
 	function makeMusicPL():Array<String>
@@ -446,28 +446,31 @@ class MainState extends FlxState
 		return music_playlist;
 	}
 
-	function createLOT8timers():Void
+	function createPresentationTimers():Void // Real units keep all of these within 2 Minutes (120 seconds), so everything should be at 7-second intervals.
 	{
-		new FlxTimer().start(0.5, timer -> CC = true); // Current Conditions
-		new FlxTimer().start(10, timer -> CCFO = true); // Current Conditions Fade Out
-		new FlxTimer().start(15, timer -> RR = true); // Regional Radar
-		new FlxTimer().start(20, timer -> DR = true); // Doppler Radar
-		new FlxTimer().start(30, timer -> LF = true);
+		trace("Created Presentation Timers");
+		new FlxTimer().start(0, timer -> CC = true); // Current Conditions
+		new FlxTimer().start(7, timer -> CCFO = true); // Current Conditions Fade Out
+		new FlxTimer().start(14, timer -> RR = true); // Regional Radar
+		new FlxTimer().start(21, timer -> DR = true); // Doppler Radar
+		new FlxTimer().start(28, timer -> LF = true);
 
 		// Local Forecast Text switching
 		// I'm aware of how messy this is, but this is legit something that needs to be done so I can
 		// avoid the FPS going to hell.
 		// ^^ see https://github.com/Zeexel/OpenStar/commit/59891df5683bdd80707f6fd9d7f95c1b88ccf907 line 590.
 
-		new FlxTimer().start(30.5, timer -> LF_0 = true);
-		new FlxTimer().start(40, timer -> LF_1 = true);
-		new FlxTimer().start(50, timer -> LF_2 = true);
-		new FlxTimer().start(60, timer -> LF_3 = true);
-		new FlxTimer().start(70, timer -> LF_4 = true);
+		// The timers for these are usually decided by the narration and when it completes,
+		// but we don't have any of the full out LF narrations. So, for now they're about 7 seconds each.
+		new FlxTimer().start(28, timer -> LF_0 = true);
+		new FlxTimer().start(35, timer -> LF_1 = true);
+		new FlxTimer().start(42, timer -> LF_2 = true);
+		new FlxTimer().start(49, timer -> LF_3 = true);
+		new FlxTimer().start(56, timer -> LF_4 = true);
 
 		// Back to panels, then we're done!
-		new FlxTimer().start(80, timer -> TWA = true);
-		new FlxTimer().start(95, timer -> finished = true);
+		new FlxTimer().start(63, timer -> TWA = true);
+		new FlxTimer().start(70, timer -> finished = true);
 	}
 
 	// Everything in this function will be called every frame

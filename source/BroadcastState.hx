@@ -29,6 +29,8 @@ class BroadcastState extends FlxState
 	private var CCIcon:FlxSprite;
 
 	// LDL loop bools
+	private var DISPLAY_TimeTick:Bool;
+	private var DISPLAY_TempTick:Bool;
 	private var DISPLAY_ID:Bool;
 	private var DISPLAY_DATE:Bool;
 	private var CC:Bool;
@@ -102,21 +104,32 @@ class BroadcastState extends FlxState
 
 		new FlxTimer().start(1200, timer -> APIHandler.getCC(), 0); // Checks every 15 minutes for current condition updates.
 
+		new FlxTimer().start(6, function(tmr:FlxTimer)
+		{
+			DISPLAY_TempTick = true;
+			DISPLAY_TimeTick = false;
+			new FlxTimer().start(6, timer ->
+			{
+				DISPLAY_TimeTick = true;
+				DISPLAY_TempTick = false;
+			});
+		}, 0);
+
 		makeTimers();
 	}
 
 	function makeTimers():Void
 	{
 		trace("Timers have been made!");
-		new FlxTimer().start(0, timer -> DISPLAY_DATE = true);
-		new FlxTimer().start(5, timer -> DISPLAY_ID = true);
-		new FlxTimer().start(10, timer -> CC = true);
-		new FlxTimer().start(15, timer -> CC_wind = true);
-		new FlxTimer().start(20, timer -> CC_humidity = true);
-		new FlxTimer().start(25, timer -> CC_pressure = true);
-		new FlxTimer().start(30, timer -> CC_visibilty = true);
-		new FlxTimer().start(35, timer -> CC_dewpoint = true);
-		new FlxTimer().start(40, timer -> makeTimers(), 0);
+		new FlxTimer().start(0, timer -> DISPLAY_ID = true);
+		new FlxTimer().start(8, timer -> DISPLAY_DATE = true);
+		new FlxTimer().start(18, timer -> CC = true);
+		new FlxTimer().start(26, timer -> CC_wind = true);
+		new FlxTimer().start(34, timer -> CC_humidity = true);
+		new FlxTimer().start(42, timer -> CC_pressure = true);
+		new FlxTimer().start(50, timer -> CC_visibilty = true);
+		new FlxTimer().start(58, timer -> CC_dewpoint = true);
+		new FlxTimer().start(66, timer -> makeTimers(), 0);
 	}
 
 	override public function update(elapsed)
@@ -150,12 +163,39 @@ class BroadcastState extends FlxState
 			});
 		}, 0);
 
+		if (DISPLAY_TempTick)
+		{
+			timeTicker.alpha -= 0.1;
+			temperatureTicker.alpha += 0.1;
+
+			if (temperatureTicker.alpha >= 1)
+			{
+				timeTicker.alpha = 0;
+				temperatureTicker.alpha = 1;
+				DISPLAY_TempTick = false;
+			}
+		}
+
+		if (DISPLAY_TimeTick)
+		{
+			timeTicker.alpha += 0.1;
+			temperatureTicker.alpha -= 0.1;
+
+			if (timeTicker.alpha >= 1)
+			{
+				timeTicker.alpha = 1;
+				temperatureTicker.alpha = 0;
+				DISPLAY_TimeTick = false;
+			}
+		}
+
 		// Basically the same system for MainState
 
 		if (DISPLAY_DATE)
 		{
 			LDL_ccTxt.visible = false;
 			LDL_cc_label.visible = false;
+			LDL_SlideText.visible = true;
 			LDL_ccTxt.setPosition(1130, 970);
 			LDL_MainText.text = DateTools.format(Date.now(), "%A, %B %m");
 			DISPLAY_DATE = false;

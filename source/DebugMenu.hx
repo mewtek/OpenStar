@@ -111,7 +111,7 @@ class DebugMenu extends FlxState
 	function loadLF():Void
 	{
 		saveSettings();
-		FlxG.switchState(new MainState());
+		FlxG.switchState(new PresentationState());
 		trace("!!SWITCH STATE!!");
 	}
 

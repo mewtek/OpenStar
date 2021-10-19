@@ -48,14 +48,6 @@ class PresentationState extends FlxState
 	private var alTitle:FlxSprite; // Almanac
 	private var twaTitle:FlxSprite; // The Week Ahead
 
-	// Text Elements
-	// LDL
-	private var LDL:FlxSprite;
-	private var LDLlogo:FlxSprite;
-	private var LDLcrawl:FlxText;
-	private var timeTicker:FlxText;
-	private var LDLslide:FlxText;
-
 	// Current condtitions panel
 	private var CCTXT:FlxTypedGroup<FlxText>;
 
@@ -107,6 +99,8 @@ class PresentationState extends FlxState
 	private var LF_3:Bool;
 	private var LF_4:Bool;
 
+	private var LDL:LowerDisplayLine;
+
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
@@ -148,6 +142,7 @@ class PresentationState extends FlxState
 		if (FlxG.sound.music == null)
 		{
 			FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
+			FlxG.sound.music.persist = false;
 		}
 
 		// create map
@@ -382,24 +377,6 @@ class PresentationState extends FlxState
 		add(DOWTXT);
 		add(NARRATIVES);
 
-		// 7-Day outlook panel
-
-		// Create LDL
-		LDL = new FlxSprite(0, FlxG.height - 165);
-		LDL.loadGraphic(Resources.graphic('LDL', 'LDL'));
-		LDL.screenCenter(X);
-		LDL.antialiasing = true;
-		LDL.y = (FlxG.height - 165);
-		add(LDL);
-
-		// TODO: Make the X value change by the length of the text of the scroll text
-
-		// LDL stuff
-		timeTicker = new FlxText(1500, 915, 150, "XX:XX"); // time updates automatically
-		timeTicker.setFormat(Resources.font('interstate-bold'), 45, FlxColor.BLACK, LEFT);
-		timeTicker.antialiasing = true;
-		add(timeTicker);
-
 		// LDLslide = new FlxText(100, 915, "CURRENTLY");
 		// LDLslide.setFormat(Resources.font('interstate-bold'), 40, FlxColor.fromString("0x697ca2"));
 		// LDLslide.antialiasing = true;
@@ -424,6 +401,9 @@ class PresentationState extends FlxState
 		});
 
 		createPresentationTimers();
+
+		LDL = new LowerDisplayLine(FlxColor.TRANSPARENT);
+		openSubState(LDL);
 	}
 
 	function makeMusicPL():Array<String>
@@ -482,10 +462,6 @@ class PresentationState extends FlxState
 			FlxG.sound.music.volume = 0.1;
 		else
 			FlxG.sound.music.volume = 0.8;
-
-		// Update time in LDL
-		// trace(DateTools.format(Date.now(), "%I:%M"));
-		timeTicker.text = DateTools.format(Date.now(), "%I:%M");
 
 		// LOT8
 		// Current Conditions
@@ -726,11 +702,18 @@ class PresentationState extends FlxState
 			BG.alpha -= 0.3;
 			if (BG.alpha == 0)
 			{
-				remove(BG);
-				remove(lf_cityName);
-				remove(twaPanel);
-				remove(twaTitle);
-				FlxG.sound.music.volume = 0;
+				// Destroy EVERYTHING to clean up memory.
+
+				ccIcon.destroy();
+				CCTXT.destroy();
+				ccTitle.destroy();
+				lfTitle.destroy();
+				lrTitle.destroy();
+				drTitle.destroy();
+				alTitle.destroy();
+				BG.destroy();
+
+				resetSubState();
 				FlxG.switchState(new BroadcastState());
 			}
 		}

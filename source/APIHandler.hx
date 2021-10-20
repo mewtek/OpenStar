@@ -59,6 +59,7 @@ class APIHandler
 	public static var _LOCATIONDATA:LOCATIONDATA;
 	public static var _FORECASTDATA:FORECASTDATA;
 
+	// IBM API DOCS: https://www.datamensional.com/weather-data-services/weather-company-data-api-documentation/
 	// Set up the API among other information using save data
 	public static function apiSetup()
 	{

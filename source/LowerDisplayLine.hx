@@ -87,7 +87,7 @@ class LowerDisplayLine extends FlxSubState
 
 		if (FileSystem.exists(Resources.icon(APIHandler._CCVARS.ccIconCode)))
 		{
-			CCIcon = new FlxSprite(1020, 930).loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
+			CCIcon = new FlxSprite(1020, 950).loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
 		}
 		else
 		{
@@ -97,6 +97,7 @@ class LowerDisplayLine extends FlxSubState
 
 		CCIcon.scale.x = 0.8;
 		CCIcon.scale.y = 0.8;
+		CCIcon.updateHitbox();
 		CCIcon.antialiasing = true;
 		CCIcon.visible = false;
 		add(CCIcon);
@@ -175,13 +176,15 @@ class LowerDisplayLine extends FlxSubState
 			LDL_cc_label.visible = false;
 			LDL_SlideText.visible = true;
 			LDL_ccTxt.setPosition(1130, 970);
-			LDL_MainText.text = DateTools.format(Date.now(), "%A, %B %m");
+			LDL_MainText.text = DateTools.format(Date.now(), "%A, %B %d");
 			DISPLAY_DATE = false;
 		}
 		if (DISPLAY_ID)
 		{
 			LDL_MainText.text = 'Local Weather ID: ${APIHandler._LOCATIONDATA.zone}';
 			LDL_SlideText.visible = false;
+			LDL_ccTxt.visible = false;
+			LDL_cc_label.visible = false;
 			DISPLAY_ID = false;
 		}
 

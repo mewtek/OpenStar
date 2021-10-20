@@ -110,11 +110,9 @@ class PresentationState extends FlxState
 		FlxG.sound.volumeUpKeys = null;
 
 		// get information from IBM
-		APIHandler.apiSetup();
 		APIHandler.get36hour();
 		APIHandler.get7Day();
 		APIHandler.getCC();
-		// APIHandler.getMap();
 
 		trace(FlxG.save.data.apiKey);
 		OS_DEBUG = FlxG.save.data.OS_DEBUG;
@@ -395,10 +393,7 @@ class PresentationState extends FlxState
 			do anything besides completely ignoring the onComplete() function that's done when
 			these are all loaded into the state.
 		 */
-		new FlxTimer().start(0.2, function(tmr:FlxTimer)
-		{
-			LOCALVOCAL_INTRO.play();
-		});
+		new FlxTimer().start(0.2, timer -> LOCALVOCAL_INTRO.play());
 
 		createPresentationTimers();
 
@@ -428,6 +423,7 @@ class PresentationState extends FlxState
 
 	function createPresentationTimers():Void // Real units keep all of these within 2 Minutes (120 seconds), so everything should be at 7-second intervals.
 	{
+		var timers:Array<FlxTimer> = FlxTimer.globalManager._timers;
 		trace("Created Presentation Timers");
 		new FlxTimer().start(0, timer -> CC = true); // Current Conditions
 		new FlxTimer().start(7, timer -> CCFO = true); // Current Conditions Fade Out

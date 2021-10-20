@@ -36,9 +36,6 @@ class LowerDisplayLine extends FlxSubState
 	override public function create()
 	{
 		super.create();
-
-		APIHandler.apiSetup();
-		APIHandler.getLocationData();
 		APIHandler.getCC();
 
 		// Make sure that everything else is still updating

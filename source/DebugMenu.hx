@@ -32,7 +32,9 @@ class DebugMenu extends FlxState
 
 	override public function create():Void
 	{
+		bgColor = FlxColor.BLACK;
 		FlxG.autoPause = false;
+		FlxG.mouse.visible = true;
 		FlxG.sound.muteKeys = null;
 		FlxG.sound.volumeDownKeys = null;
 		FlxG.sound.volumeUpKeys = null;
@@ -111,7 +113,7 @@ class DebugMenu extends FlxState
 	function loadLF():Void
 	{
 		saveSettings();
-		FlxG.switchState(new PresentationState());
+		FlxG.switchState(new InitializationState());
 		trace("!!SWITCH STATE!!");
 	}
 

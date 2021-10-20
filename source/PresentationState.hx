@@ -113,8 +113,7 @@ class PresentationState extends FlxState
 		bgColor = 0x0047bb;
 
 		// get information from IBM
-		APIHandler.get36hour();
-		APIHandler.get7Day();
+		APIHandler.getLocalForecast();
 		APIHandler.getCC();
 
 		trace(FlxG.save.data.apiKey);
@@ -375,9 +374,9 @@ class PresentationState extends FlxState
 
 		// tfw I was about to do this by making a shitload of FlxText variables
 		// https://github.com/AyeTSG/Funkin_SmallThings/blob/master/source/OptionsMenu.hx
-		for (i in 0...APIHandler._FORECASTDATA.dow.length)
+		for (i in 0...APIHandler._FORECASTDATA.daypart_name.length)
 		{
-			var txt = new FlxText(150, 275, 700, APIHandler._FORECASTDATA.dow[i]);
+			var txt = new FlxText(150, 275, 700, APIHandler._FORECASTDATA.daypart_name[i]);
 			txt.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
 			txt.alpha = 0;
 			txt.antialiasing = true;

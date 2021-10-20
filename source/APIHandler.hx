@@ -40,8 +40,17 @@ typedef CCVARS =
 
 typedef FORECASTDATA =
 {
-	var dow:Array<String>;
+	var daypart_name:Array<String>;
 	var narrative:Array<String>;
+}
+
+typedef SEVENDAYDATA =
+{
+	var iconCodes:Array<String>;
+	var hiTemps:Array<String>;
+	var loTemps:Array<String>;
+	var dow:Array<String>;
+	var isWeekend:Array<Bool>;
 }
 
 // Handles calls to IBM's JSON API.
@@ -58,6 +67,7 @@ class APIHandler
 	public static var _CCVARS:CCVARS;
 	public static var _LOCATIONDATA:LOCATIONDATA;
 	public static var _FORECASTDATA:FORECASTDATA;
+	public static var _SEVENDAYDATA:SEVENDAYDATA;
 
 	// IBM API DOCS: https://www.datamensional.com/weather-data-services/weather-company-data-api-documentation/
 	// Set up the API among other information using save data
@@ -137,55 +147,103 @@ class APIHandler
 		API.request();
 	}
 
-	// Obtain information for the 36-Hour forecast
+	// Obtain information for the local forecast + The Week Ahead
 	// NOTE: getLocationData() needs to be ran so this function can get the latitude and longitude for the location!
-	// https://weather.com/swagger-docs/ui/sun/v1/sunV1DailyForecast.json
-	public static function get36hour():Void
+	// https://docs.google.com/document/d/1RY44O8ujbIA_tjlC4vYKHKzwSwEmNxuGw5sEJ9dYjG4/edit
+	public static function getLocalForecast():Void
 	{
-		var APIURL:String = 'https://api.weather.com/v1/geocode/${_LOCATIONDATA.lat}/${_LOCATIONDATA.long}/forecast/daily/3day.json?apiKey=${APIKey}&units=${units}&language=$lang';
+		var APIURL:String = 'https://api.weather.com/v3/wx/forecast/daily/7day?geocode=${_LOCATIONDATA.lat},${_LOCATIONDATA.long}&format=json&units=$units&language=$lang&apiKey=$APIKey';
 		var API = new haxe.Http(APIURL);
 
+		// Used for LF segment
 		var names:Array<String> = [];
 		var narratives:Array<String> = [];
+
+		// For 7-day outlook
+		var ICONS:Array<String> = [];
+		var HI:Array<String> = [];
+		var LO:Array<String> = [];
+		var DOW:Array<String> = [];
+		var WEEKEND:Array<Bool> = [];
 
 		API.onData = function(data:String)
 		{
 			var res = Json.parse(data);
 
-			for (i in 0...res.forecasts.length)
+			// 38-hour forecast setup
+			for (i in 0...res.daypart[0].daypartName.length)
 			{
-				// obtain daypart names
-				trace(i);
-
-				if (res.forecasts[i].alt_daypart_name != null)
+				if (res.daypart[0].daypartName[i] != null)
 				{
-					names.push(res.forecasts[i].alt_daypart_name);
-					names.push(res.forecasts[i].night.alt_daypart_name);
-				}
-				else
-				{
-					names.push(res.forecasts[i].dow);
-					names.push(res.forecasts[i].night.alt_daypart_name);
-				}
+					names.push(res.daypart[0].daypartName[i]);
+					narratives.push(res.daypart[0].narrative[i]);
+					trace(res.daypart[0].daypartName[i] + ": " + res.daypart[0].narrative[i]);
 
-				// obtain forecasts
-				if (res.forecasts[i].narrative != null)
-					narratives.push(res.forecasts[i].narrative);
-				else
-					narratives.push("Forecast not available.");
-
-				if (res.forecasts[i].night.narrative != null)
-					narratives.push(res.forecasts[i].night.narrative);
-				else
-					narratives.push("Forecast not available.");
+					if (res.daypart[0].narrative[i] == null)
+						narratives.push("Forecast not available.");
+				}
 			}
 
-			trace(names.length);
-			trace(narratives.length);
-
 			_FORECASTDATA = {
-				dow: names,
+				daypart_name: names,
 				narrative: narratives
+			};
+
+			// 7-Day outlook!
+			for (i in 0...res.dayOfWeek.length)
+			{
+				ICONS.push('44'); // TODO: Figure out icons
+
+				if (res.calendarDayTemperatureMax[i] != null)
+					HI.push('${res.calendarDayTemperatureMax[i]}');
+				else
+					HI.push("N/A");
+
+				if (res.calendarDayTemperatureMin != null)
+					LO.push('${res.calendarDayTemperatureMin}');
+				else
+					LO.push("N/A");
+
+				// TODO: V3 is a bit weird with 7-day so I have to work out some other stuff.
+
+				switch (res.dayOfWeek[i])
+				{
+					case "Sunday":
+						DOW.push("SUN");
+						WEEKEND.push(true);
+
+					case "Monday":
+						DOW.push("MON");
+						WEEKEND.push(false);
+
+					case "Tuesday":
+						DOW.push("TUE");
+						WEEKEND.push(false);
+
+					case "Wednesday":
+						DOW.push("WED");
+						WEEKEND.push(false);
+
+					case "Thursday":
+						DOW.push("THU");
+						WEEKEND.push(false);
+
+					case "Friday":
+						DOW.push("FRI");
+						WEEKEND.push(false);
+
+					case "Saturday":
+						DOW.push("SAT");
+						WEEKEND.push(true);
+				}
+			}
+
+			_SEVENDAYDATA = {
+				iconCodes: ICONS,
+				hiTemps: HI,
+				loTemps: LO,
+				dow: DOW,
+				isWeekend: WEEKEND
 			};
 		}
 
@@ -197,11 +255,6 @@ class APIHandler
 
 		API.request();
 	}
-
-	// Obtains a 7-Day Forecast, mainly used for
-	// The Week Ahead panels and the forecast panels.
-	// https://weather.com/swagger-docs/ui/sun/v1/sunV1DailyForecast.json
-	public static function get7Day():Void {}
 
 	// Obtains the current conditions around the region for the given
 	// area.
@@ -222,6 +275,7 @@ class APIHandler
 	// 		File.saveBytes(path, l.data);
 	// 		trace("Downloaded a map that was " + l.data.length + " bytes.");
 	// 	});
-	// 	l.load(new URLRequest('https://api.mapbox.com/styles/v1/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc/static/${_LOCATIONDATA.long},${_LOCATIONDATA.lat},8.43,0,1/1280x720@2x?access_token=pk.eyJ1IjoiemVleGVsMzIiLCJhIjoiY2tzemU0M2o5MHl3ODJwcWl2YjhxbnRxOCJ9.don8TkevF9UuD_v11OPKiw'));
+	// note to self: dont put your entire fucking MapBox API key in an unused function
+	// 	l.load(new URLRequest('https://api.mapbox.com/styles/v1/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc/static/${_LOCATIONDATA.long},${_LOCATIONDATA.lat},8.43,0,1/1280x720@2x?access_token=juneyoufuckingdumbass'));
 	// }
 }

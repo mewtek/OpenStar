@@ -76,6 +76,14 @@ class PresentationState extends FlxState
 	private var NARRATIVES:FlxTypedGroup<FlxText>;
 	private var lf_cityName:FlxText;
 
+	// The Week Ahead panel
+	private var twaIcons:FlxTypedGroup<FlxSprite>;
+	private var twaHiTemps:FlxTypedGroup<FlxText>;
+	private var twaLoTemps:FlxTypedGroup<FlxText>;
+	private var twaPhrases:FlxTypedGroup<FlxText>;
+	private var twaDays:FlxTypedGroup<FlxText>;
+	private var twaWeekend:FlxTypedGroup<FlxSprite>;
+
 	// Sounds
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
 	private var LOCALVOCAL_TMP:FlxSound; // Temperature narration
@@ -250,11 +258,7 @@ class PresentationState extends FlxState
 		twaPanel.alpha = 0;
 		add(twaPanel);
 
-		twaPanel.loadGraphic(twaPanelTex);
-		twaPanel.screenCenter(X);
-		twaPanel.antialiasing = true;
-
-		// Create panel information
+		// Panel logic
 
 		// Current condtions
 
@@ -331,10 +335,10 @@ class PresentationState extends FlxState
 		wndLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
 		gustLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
 
-		CCTXT.add(condTxt);
 		CCTXT.add(cc_cityName);
-		CCTXT.add(tmpTxt);
 
+		CCTXT.add(condTxt);
+		CCTXT.add(tmpTxt);
 		CCTXT.add(rhTxt);
 		CCTXT.add(dpTxt);
 		CCTXT.add(baroTxt);
@@ -362,6 +366,85 @@ class PresentationState extends FlxState
 		ccIcon.alpha = 0;
 
 		add(CCTXT);
+
+		// 7-Day Outlook
+		twaIcons = new FlxTypedGroup<FlxSprite>();
+		twaHiTemps = new FlxTypedGroup<FlxText>();
+		twaLoTemps = new FlxTypedGroup<FlxText>();
+		twaPhrases = new FlxTypedGroup<FlxText>();
+		twaDays = new FlxTypedGroup<FlxText>();
+		twaWeekend = new FlxTypedGroup<FlxSprite>();
+
+		for (i in 0...7)
+		{
+			// Icons
+			var icon:FlxSprite;
+			if (FileSystem.exists(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i])))
+			{
+				icon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i]), false);
+			}
+			else
+			{
+				trace('FAILED TO FIND ICON CODE ${APIHandler._SEVENDAYDATA.iconCodes[i]}, DEFAULTING TO N/A ICON');
+				icon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
+			}
+
+			icon.antialiasing = true;
+			icon.scale.x = 1.5;
+			icon.scale.y = 1.5;
+			icon.updateHitbox();
+			icon.setPosition((twaIcons.members[i - 1] != null ? twaIcons.members[i - 1].x + 235 : 160), 330);
+			icon.ID = i;
+			twaIcons.add(icon);
+
+			// Hi/Lo Temperature Labels
+			var hiTemp:FlxText;
+			hiTemp = new FlxText((twaHiTemps.members[i - 1] != null ? twaHiTemps.members[i - 1].x + 235 : 155), 625, 200, APIHandler._SEVENDAYDATA.hiTemps[i]);
+			hiTemp.setFormat(Resources.font('interstate-bold'), 100, FlxColor.WHITE, CENTER);
+			hiTemp.antialiasing = true;
+			hiTemp.ID = i;
+			twaHiTemps.add(hiTemp);
+
+			var loTemp:FlxText;
+			loTemp = new FlxText((twaLoTemps.members[i - 1] != null ? twaLoTemps.members[i - 1].x + 235 : 155), 725, 200, APIHandler._SEVENDAYDATA.loTemps[i]);
+			loTemp.setFormat(Resources.font('interstate-bold'), 100, FlxColor.WHITE, CENTER);
+			loTemp.antialiasing = true;
+			loTemp.ID = i;
+			twaLoTemps.add(loTemp);
+
+			// Days + Weekend rectangle graphic
+			var DOW:FlxText;
+			DOW = new FlxText((twaDays.members[i - 1] != null ? twaDays.members[i - 1].x + 235 : 176), 280, 150, APIHandler._SEVENDAYDATA.dow[i]);
+			DOW.setFormat(Resources.font('interstate-light'), 50, (APIHandler._SEVENDAYDATA.isWeekend[i] ? FlxColor.fromString("0x102a70") : FlxColor.WHITE),
+				CENTER);
+			DOW.antialiasing = true;
+			DOW.ID = i;
+			twaDays.add(DOW);
+
+			var WEEKEND_RECT:FlxSprite;
+			WEEKEND_RECT = new FlxSprite((twaWeekend.members[i - 1] != null ? twaWeekend.members[i - 1].x + 235 : 145.5),
+				274).makeGraphic(218, 60, FlxColor.WHITE);
+			WEEKEND_RECT.antialiasing = true;
+			WEEKEND_RECT.visible = APIHandler._SEVENDAYDATA.isWeekend[i];
+			WEEKEND_RECT.alpha = 0.95;
+			WEEKEND_RECT.ID = i;
+			twaWeekend.add(WEEKEND_RECT);
+		}
+
+		for (i in 0...twaDays.members.length)
+		{
+			twaDays.members[i].alpha = 0;
+			twaWeekend.members[i].alpha = 0;
+			twaHiTemps.members[i].alpha = 0;
+			twaLoTemps.members[i].alpha = 0;
+			twaIcons.members[i].alpha = 0;
+		}
+
+		add(twaIcons);
+		add(twaHiTemps);
+		add(twaLoTemps);
+		add(twaWeekend);
+		add(twaDays);
 
 		// 36-hour forecast
 		DOWTXT = new FlxTypedGroup<FlxText>();
@@ -397,11 +480,6 @@ class PresentationState extends FlxState
 		add(lf_cityName);
 		add(DOWTXT);
 		add(NARRATIVES);
-
-		// LDLslide = new FlxText(100, 915, "CURRENTLY");
-		// LDLslide.setFormat(Resources.font('interstate-bold'), 40, FlxColor.fromString("0x697ca2"));
-		// LDLslide.antialiasing = true;
-		// add(LDLslide);
 
 		// Narrations
 
@@ -709,6 +787,24 @@ class PresentationState extends FlxState
 			twaPanel.alpha += 0.1;
 			twaTitle.alpha += 0.1;
 
+			for (i in 0...twaDays.members.length)
+			{
+				twaDays.members[i].alpha += 0.1;
+				twaWeekend.members[i].alpha += 0.1;
+				twaHiTemps.members[i].alpha += 0.1;
+				twaLoTemps.members[i].alpha += 0.1;
+				twaIcons.members[i].alpha += 0.1;
+
+				if (twaDays.members[i].alpha >= 1)
+				{
+					twaDays.members[i].alpha = 1;
+					twaWeekend.members[i].alpha = 1;
+					twaHiTemps.members[i].alpha = 1;
+					twaLoTemps.members[i].alpha = 1;
+					twaIcons.members[i].alpha = 1;
+				}
+			}
+
 			// TODO: 7-Day Outlook code
 
 			if (twaTitle.alpha >= 1)
@@ -723,6 +819,16 @@ class PresentationState extends FlxState
 			twaTitle.alpha -= 0.3;
 			lf_cityName.alpha -= 0.3;
 			BG.alpha -= 0.3;
+
+			for (i in 0...twaDays.members.length)
+			{
+				twaDays.members[i].alpha -= 0.3;
+				twaWeekend.members[i].alpha -= 0.3;
+				twaHiTemps.members[i].alpha -= 0.3;
+				twaLoTemps.members[i].alpha -= 0.3;
+				twaIcons.members[i].alpha -= 0.3;
+			}
+
 			if (BG.alpha == 0)
 			{
 				// Destroy EVERYTHING to clean up memory.
@@ -734,6 +840,14 @@ class PresentationState extends FlxState
 				lrTitle.destroy();
 				drTitle.destroy();
 				alTitle.destroy();
+
+				// Destroy TWA stuff
+				twaDays.destroy();
+				twaWeekend.destroy();
+				twaHiTemps.destroy();
+				twaLoTemps.destroy();
+				twaIcons.destroy();
+
 				BG.destroy();
 
 				resetSubState();

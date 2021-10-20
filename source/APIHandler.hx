@@ -200,7 +200,7 @@ class APIHandler
 					HI.push("N/A");
 
 				if (res.calendarDayTemperatureMin != null)
-					LO.push('${res.calendarDayTemperatureMin}');
+					LO.push('${res.calendarDayTemperatureMin[i]}');
 				else
 					LO.push("N/A");
 
@@ -237,6 +237,9 @@ class APIHandler
 						WEEKEND.push(true);
 				}
 			}
+
+			trace(DOW);
+			trace(WEEKEND);
 
 			_SEVENDAYDATA = {
 				iconCodes: ICONS,

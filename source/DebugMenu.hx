@@ -39,17 +39,12 @@ class DebugMenu extends FlxState
 		FlxG.sound.volumeDownKeys = null;
 		FlxG.sound.volumeUpKeys = null;
 		initSettings(); // Do this so we can actually change values.
-		// APIHandler.apiSetup();
-		// APIHandler.getLocationData();
-		// APIHandler.getMap();
 
 		_lfBtn = new FlxButton(0, FlxG.height - 40, null, loadLF);
 		_lfBtn.scale.x = 1.5;
 		_lfBtn.scale.y = 1.5;
 		_lfBtn.updateHitbox();
 		add(_lfBtn);
-
-		// bgColor = 0xFFFF00FF;
 
 		// Text boxes
 		areaCodeBox = new FlxInputText(0, 30, 200, '${FlxG.save.data.areaCode}', 15);

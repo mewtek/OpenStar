@@ -20,12 +20,17 @@ class OSSettings
 		if (FlxG.save.data.apiKey == null)
 			FlxG.save.data.apiKey = "d522aa97197fd864d36b418f39ebb323"; // feel free to use this if you're building a custom version!
 
-		if (FlxG.save.data.lfOnlyUnit == null)
-			FlxG.save.data.lfOnlyUnit = false; // Do we want this unit to only do LOT8 simulation?
+		// Mapbox
+		if (FlxG.save.data.mapboxKey == null) // Get a key from https://www.mapbox.com/
+			FlxG.save.data.mapboxKey = '';
+
+		if (FlxG.save.data.mapStyle == null)
+			FlxG.save.data.mapStyle = "/zeexel32/ckuoj1uwh06qo18qiyyk6h0zc"; // Exclude mapbox://styles/
 
 		// Broadcast settings
-		if (FlxG.save.data.chromaColor == null)
-			FlxG.save.data.chromaColor = "0047bb"; // Defaults to using a blue screen chroma key (for OBS)
+
+		if (FlxG.save.data.lfOnlyUnit == null)
+			FlxG.save.data.lfOnlyUnit = false; // Do we want this unit to only do LOT8 simulation?
 
 		if (FlxG.save.data.EAS == null)
 			FlxG.save.data.EAS = false; // This will stop the unit entirely and just kick in the EAS substate.

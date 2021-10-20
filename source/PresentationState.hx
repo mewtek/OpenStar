@@ -30,8 +30,10 @@ class PresentationState extends FlxState
 	private var OS_DEBUG:Bool;
 	private var activeAlert:Bool;
 
-	// General graphics
+	// Generic Graphics
 	private var BG:FlxSprite;
+	private var baroArrow:FlxSprite; // Genuinely thought this was a hilarious name for no reason
+	private var aqArrow:FlxSprite;
 
 	// Panels
 	private var ccPanel:FlxSprite;
@@ -108,6 +110,7 @@ class PresentationState extends FlxState
 		FlxG.sound.muteKeys = null;
 		FlxG.sound.volumeDownKeys = null;
 		FlxG.sound.volumeUpKeys = null;
+		bgColor = 0x0047bb;
 
 		// get information from IBM
 		APIHandler.get36hour();
@@ -133,8 +136,6 @@ class PresentationState extends FlxState
 			BG.antialiasing = false;
 			add(BG);
 		}
-
-		bgColor = 0x0047bb;
 
 		makeMusicPL();
 		if (FlxG.sound.music == null)
@@ -271,10 +272,33 @@ class PresentationState extends FlxState
 
 		ccIcon.scale.set(1.7, 1.7);
 		ccIcon.updateHitbox();
-
 		ccIcon.setPosition(268, 320);
-
 		ccIcon.antialiasing = true;
+
+		// create barometric pressure trend graphic
+		switch (APIHandler._CCVARS.baroTrend)
+		{
+			case "Steady":
+				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'steady'));
+			case "Rising":
+				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
+			case "Rapidly Rising":
+				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
+			case "Falling":
+				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
+				baroArrow.angle = 180;
+			case "Rapidly Falling":
+				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
+				baroArrow.angle = 180;
+		}
+
+		baroArrow.scale.x = 0.35;
+		baroArrow.scale.y = 0.35;
+		baroArrow.updateHitbox();
+		baroArrow.antialiasing = true;
+		baroArrow.setPosition(1450, 480);
+		baroArrow.alpha = 0;
+		add(baroArrow);
 
 		// Text elements
 		CCTXT = new FlxTypedGroup<FlxText>();
@@ -467,6 +491,7 @@ class PresentationState extends FlxState
 			ccPanel.alpha += 0.1;
 			ccTitle.alpha += 0.1;
 			ccIcon.alpha += 0.1;
+			baroArrow.alpha += 0.1;
 
 			for (i in 0...CCTXT.members.length)
 			{
@@ -481,6 +506,7 @@ class PresentationState extends FlxState
 				ccPanel.alpha = 1;
 				ccTitle.alpha = 1;
 				ccIcon.alpha = 1;
+				baroArrow.alpha = 1;
 				CC = false;
 			}
 		}
@@ -492,6 +518,7 @@ class PresentationState extends FlxState
 
 			ccPanel.alpha -= 0.3;
 			ccIcon.alpha -= 0.3;
+			baroArrow.alpha -= 0.3;
 
 			for (i in 0...CCTXT.members.length)
 			{
@@ -505,6 +532,7 @@ class PresentationState extends FlxState
 			{
 				remove(ccPanel);
 				remove(ccIcon);
+				remove(baroArrow);
 				CCFO = false;
 			}
 		}

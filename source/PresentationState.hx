@@ -15,15 +15,6 @@ import flixel.util.FlxColor;
 import flixel.util.FlxGradient;
 import flixel.util.FlxGradient;
 import flixel.util.FlxTimer;
-import haxe.Timer;
-import haxe.io.Path;
-import lime.app.Future;
-import lime.math.BGRA;
-import lime.media.AudioBuffer;
-import lime.utils.Resource;
-import openfl.display.BitmapData;
-import openfl.media.Sound;
-import openfl.utils.ByteArray;
 import sys.FileSystem;
 import sys.io.File;
 
@@ -569,9 +560,22 @@ class PresentationState extends FlxState
 		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[14].time + 7, timer -> finished = true);
 	}
 
-	function presentationLogic():Void
+	// Everything in this function will be called every frame
+	// Remember to destroy your timers!
+	override public function update(elapsed):Void
 	{
-		if (CURRENT_CONDITIONS == true)
+		// Lower audio when any of the local vocals are playing
+		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
+			FlxG.sound.music.volume = 0.1;
+		else
+			FlxG.sound.music.volume = 0.8;
+
+		if (PresentationTimers.active)
+			PresentationTimers.update(elapsed);
+
+		// Alot of this is just copy and paste code, most of the panel creation and logic is handled in create()
+
+		if (CURRENT_CONDITIONS)
 		{
 			ccPanel.alpha += 0.1;
 			ccTitle.alpha += 0.1;
@@ -593,6 +597,266 @@ class PresentationState extends FlxState
 				ccIcon.alpha = 1;
 				baroArrow.alpha = 1;
 				CURRENT_CONDITIONS = false;
+			}
+		}
+
+		if (REGIONAL_OBSERVATIONS)
+		{
+			ccPanel.alpha -= 0.1;
+			ccIcon.alpha -= 0.1;
+			baroArrow.alpha -= 0.1;
+
+			for (i in 0...CCTXT.members.length)
+			{
+				CCTXT.members[i].alpha -= 0.1;
+
+				if (CCTXT.members[i].alpha == 0)
+					remove(CCTXT);
+			}
+
+			if (ccPanel.alpha == 0)
+			{
+				remove(ccPanel);
+				remove(ccIcon);
+				remove(baroArrow);
+				REGIONAL_OBSERVATIONS = false;
+			}
+
+			// TODO: Make graphics for the regional observations
+			// Fade them in here
+
+			// REGIONAL_OBSERVATIONS = false;
+		}
+
+		if (REGIONAL_RADAR)
+		{
+			ccTitle.alpha -= 0.1;
+			if (ccTitle.alpha == 0)
+				remove(ccTitle);
+
+			rrTitle.alpha += 0.1;
+			// TODO: Get maps working so they fade in correctly here
+			if (rrTitle.alpha >= 1)
+			{
+				rrTitle.alpha = 1;
+				REGIONAL_RADAR = false;
+			}
+		}
+
+		if (ALMANAC)
+		{
+			rrTitle.alpha -= 0.1;
+			if (rrTitle.alpha == 0)
+				remove(rrTitle);
+
+			alTitle.alpha += 0.1;
+			if (alTitle.alpha >= 1)
+			{
+				alTitle.alpha = 1;
+				ALMANAC = false;
+			}
+		}
+
+		if (AIR_QUALITY)
+		{
+			alTitle.alpha -= 0.1;
+
+			trace("AIR QUALITY ISN'T IMPLEMENTED");
+			// TODO:
+			// This needs graphics and panel logic, as well as some transitions for the panel's arrow.
+			if (alTitle.alpha == 0)
+			{
+				remove(alTitle);
+				AIR_QUALITY = false;
+			}
+		}
+
+		if (OUTDOOR_ACTIVITY)
+		{
+			// Fade out the air quality title
+			OUTDOOR_ACTIVITY = false;
+			// TOOD: Graphics setup for the air quality forecast and others.
+		}
+
+		if (DAYPART_FORECAST)
+		{
+			// TOOD: Graphics setup for the air quality forecast and others.
+			DAYPART_FORECAST = false;
+		}
+
+		if (REGIONAL_FORECAST)
+		{
+			REGIONAL_FORECAST = false;
+			// TODO: Needs logic + graphics
+		}
+
+		// LOCAL FORECAST
+		if (LF)
+		{
+			// FADE OUT THE REGIONAL FORECAST GRAPHICS
+			lfTitle.alpha += 0.1;
+			lf_cityName.alpha += 0.1;
+			lfPanel.alpha += 0.1;
+
+			if (lfPanel.alpha >= 1)
+			{
+				lfTitle.alpha = 1;
+				lf_cityName.alpha = 1;
+				lfPanel.alpha = 1;
+				LF = false;
+			}
+		}
+
+		if (LF_0)
+		{
+			DOWTXT.members[0].alpha += 0.1;
+			NARRATIVES.members[0].alpha += 0.1;
+
+			if (DOWTXT.members[0].alpha >= 1)
+			{
+				DOWTXT.members[0].alpha = 1;
+				NARRATIVES.members[0].alpha = 1;
+				LF_0 = false;
+			}
+		}
+
+		if (LF_1)
+		{
+			DOWTXT.members[0].alpha -= 0.1;
+			NARRATIVES.members[0].alpha -= 0.1;
+
+			if (DOWTXT.members[0].alpha == 0)
+			{
+				DOWTXT.members[0].alpha = 0;
+				NARRATIVES.members[0].alpha = 0;
+			}
+
+			DOWTXT.members[1].alpha += 0.1;
+			NARRATIVES.members[1].alpha += 0.1;
+
+			if (DOWTXT.members[1].alpha >= 1)
+			{
+				DOWTXT.members[1].alpha = 1;
+				NARRATIVES.members[1].alpha = 1;
+				LF_1 = false;
+			}
+		}
+
+		if (LF_2)
+		{
+			DOWTXT.members[1].alpha -= 0.1;
+			NARRATIVES.members[1].alpha -= 0.1;
+
+			if (DOWTXT.members[1].alpha == 0)
+			{
+				DOWTXT.members[1].alpha = 0;
+				NARRATIVES.members[1].alpha = 0;
+			}
+
+			DOWTXT.members[2].alpha += 0.1;
+			NARRATIVES.members[2].alpha += 0.1;
+
+			if (DOWTXT.members[2].alpha >= 1)
+			{
+				DOWTXT.members[2].alpha = 1;
+				NARRATIVES.members[2].alpha = 1;
+				LF_2 = false;
+			}
+		}
+
+		if (LF_3)
+		{
+			DOWTXT.members[2].alpha -= 0.1;
+			NARRATIVES.members[2].alpha -= 0.1;
+
+			if (DOWTXT.members[2].alpha == 0)
+			{
+				DOWTXT.members[2].alpha = 0;
+				NARRATIVES.members[2].alpha = 0;
+			}
+
+			DOWTXT.members[3].alpha += 0.1;
+			NARRATIVES.members[3].alpha += 0.1;
+
+			if (DOWTXT.members[3].alpha >= 1)
+			{
+				DOWTXT.members[3].alpha = 1;
+				NARRATIVES.members[3].alpha = 1;
+				LF_3 = false;
+			}
+		}
+
+		if (LF_4)
+		{
+			DOWTXT.members[3].alpha -= 0.1;
+			NARRATIVES.members[3].alpha -= 0.1;
+
+			if (DOWTXT.members[3].alpha == 0)
+			{
+				DOWTXT.members[3].alpha = 0;
+				NARRATIVES.members[3].alpha = 0;
+			}
+
+			DOWTXT.members[4].alpha += 0.1;
+			NARRATIVES.members[4].alpha += 0.1;
+
+			if (DOWTXT.members[4].alpha >= 1)
+			{
+				DOWTXT.members[4].alpha = 1;
+				NARRATIVES.members[4].alpha = 1;
+				LF_4 = false;
+			}
+		}
+
+		if (THE_WEEK_AHEAD)
+		{
+			if (DOWTXT != null)
+			{
+				DOWTXT.members[4].alpha -= 0.1;
+				NARRATIVES.members[4].alpha -= 0.1;
+
+				if (DOWTXT.members[4].alpha == 0)
+				{
+					remove(DOWTXT);
+					remove(NARRATIVES);
+				}
+			}
+
+			lfTitle.alpha -= 0.1;
+			lfPanel.alpha -= 0.1;
+
+			if (lfTitle.alpha == 0)
+			{
+				remove(lfTitle);
+				remove(lfPanel);
+			}
+
+			twaTitle.alpha += 0.1;
+			twaPanel.alpha += 0.1;
+
+			for (i in 0...twaDays.members.length)
+			{
+				twaIcons.members[i].alpha += 0.1;
+				twaHiTemps.members[i].alpha += 0.1;
+				twaLoTemps.members[i].alpha += 0.1;
+				twaDays.members[i].alpha += 0.1;
+				twaWeekend.members[i].alpha += 0.1;
+
+				if (twaDays.members[i].alpha >= 1)
+				{
+					twaIcons.members[i].alpha = 1;
+					twaHiTemps.members[i].alpha = 1;
+					twaLoTemps.members[i].alpha = 1;
+					twaDays.members[i].alpha = 1;
+					twaWeekend.members[i].alpha = 1;
+				}
+			}
+
+			if (twaTitle.alpha >= 1)
+			{
+				twaTitle.alpha = 1;
+				twaPanel.alpha = 1;
+				THE_WEEK_AHEAD = false;
 			}
 		}
 
@@ -634,28 +898,11 @@ class PresentationState extends FlxState
 				twaIcons.destroy();
 
 				BG.destroy();
-				FlxTimer.globalManager.destroy();
 
 				resetSubState();
 				FlxG.switchState(new BroadcastState());
 			}
 		}
-	}
-
-	// Everything in this function will be called every frame
-	// Remember to destroy your timers!
-	override public function update(elapsed):Void
-	{
-		// Lower audio when any of the local vocals are playing
-		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
-			FlxG.sound.music.volume = 0.1;
-		else
-			FlxG.sound.music.volume = 0.8;
-
-		if (PresentationTimers.active)
-			PresentationTimers.update(elapsed);
-
-		presentationLogic();
 
 		super.update(elapsed);
 	}

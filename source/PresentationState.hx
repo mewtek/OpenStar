@@ -16,9 +16,12 @@ import flixel.util.FlxGradient;
 import flixel.util.FlxGradient;
 import flixel.util.FlxTimer;
 import haxe.io.Path;
+import lime.app.Future;
 import lime.math.BGRA;
+import lime.media.AudioBuffer;
 import lime.utils.Resource;
 import openfl.display.BitmapData;
+import openfl.media.Sound;
 import openfl.utils.ByteArray;
 import sys.FileSystem;
 import sys.io.File;
@@ -145,6 +148,7 @@ class PresentationState extends FlxState
 		}
 
 		makeMusicPL();
+
 		if (FlxG.sound.music == null)
 		{
 			FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
@@ -295,11 +299,11 @@ class PresentationState extends FlxState
 				baroArrow.angle = 180;
 		}
 
-		baroArrow.scale.x = 0.35;
-		baroArrow.scale.y = 0.35;
+		baroArrow.scale.x = 0.25;
+		baroArrow.scale.y = 0.25;
 		baroArrow.updateHitbox();
 		baroArrow.antialiasing = true;
-		baroArrow.setPosition(1450, 480);
+		baroArrow.setPosition(1485, 500);
 		baroArrow.alpha = 0;
 		add(baroArrow);
 
@@ -483,18 +487,23 @@ class PresentationState extends FlxState
 
 		// Narrations
 
-		LOCALVOCAL_INTRO = FlxG.sound.load(Resources.narration("CC_INTRO1", null), 1.0, false, null, false, false, null, () -> LOCALVOCAL_TMP.play());
-		LOCALVOCAL_TMP = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.temperature}', "temperatures"), 1.0, false, null, false, false, null,
-			() -> LOCALVOCAL_CC.play());
-		LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions"));
+		if (FlxG.save.data.localVocal)
+		{
+			LOCALVOCAL_INTRO = FlxG.sound.load(Resources.narration("CC_INTRO1", null), 1.0, false, null, false, false, null, () -> LOCALVOCAL_TMP.play());
+			LOCALVOCAL_TMP = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.temperature}', "temperatures"), 1.0, false, null, false, false, null,
+				() -> LOCALVOCAL_CC.play());
+			LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions"));
 
-		/*
-			I genuinely don't know why, but for some god-forsaken reason,
-			using the StartTime variable in the play() function for FlxG doesn't actually
-			do anything besides completely ignoring the onComplete() function that's done when
-			these are all loaded into the state.
-		 */
-		new FlxTimer().start(0.2, timer -> LOCALVOCAL_INTRO.play());
+			/*
+				I genuinely don't know why, but for some god-forsaken reason,
+				using the StartTime variable in the play() function for FlxG doesn't actually
+				do anything besides completely ignoring the onComplete() function that's done when
+				these are all loaded into the state.
+			 */
+			new FlxTimer().start(0.2, timer -> LOCALVOCAL_INTRO.play());
+		}
+		else
+			trace("Skipping local vocal initalization because it's false..");
 
 		createPresentationTimers();
 
@@ -849,6 +858,7 @@ class PresentationState extends FlxState
 				twaIcons.destroy();
 
 				BG.destroy();
+				FlxTimer.globalManager.destroy();
 
 				resetSubState();
 				FlxG.switchState(new BroadcastState());

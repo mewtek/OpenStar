@@ -81,7 +81,7 @@ class APIHandler
 		areaCode = FlxG.save.data.areaCode;
 		lang = FlxG.save.data.lang;
 
-		getLocationData(); // Do this so we dont ave to run it in MainState;
+		getLocationData(); // Do this so we dont have to run it in MainState;
 	}
 
 	// https://weather.com/swagger-docs/ui/sun/v3/sunV3LocationSearch.json

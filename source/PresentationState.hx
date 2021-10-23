@@ -97,20 +97,29 @@ class PresentationState extends FlxState
 	private var map:FlxSprite;
 
 	// LOT8 Slide bools
-	private var CC:Bool;
-	private var CCFO:Bool;
-	private var RR:Bool;
-	private var DR:Bool;
-	private var TWA:Bool;
-	private var finished:Bool;
+	// uses https://twcclassics.com/information/intellistar-flavors.html as reference.
+	private var CURRENT_CONDITIONS:Bool;
+	private var REGIONAL_OBSERVATIONS:Bool;
+	private var REGIONAL_RADAR:Bool;
+	private var ALMANAC:Bool;
+	private var AIR_QUALITY:Bool;
+	// or
+	private var OUTDOOR_ACTIVITY:Bool;
+	private var DAYPART_FORECAST:Bool;
+	private var REGIONAL_FORECAST:Bool;
+	private var LF:Bool; // Local Forecast
+	private var EXTENDED_FORECAST:Bool;
+	// or
+	private var THE_WEEK_AHEAD:Bool;
 
 	// this is a stupid way of doing this lmao
-	private var LF:Bool;
 	private var LF_0:Bool;
 	private var LF_1:Bool;
 	private var LF_2:Bool;
 	private var LF_3:Bool;
 	private var LF_4:Bool;
+
+	private var finished:Bool;
 
 	private var LDL:LowerDisplayLine;
 
@@ -535,28 +544,23 @@ class PresentationState extends FlxState
 	{
 		var timers:Array<FlxTimer> = FlxTimer.globalManager._timers;
 		trace("Created Presentation Timers");
-		new FlxTimer().start(0, timer -> CC = true); // Current Conditions
-		new FlxTimer().start(7, timer -> CCFO = true); // Current Conditions Fade Out
-		new FlxTimer().start(14, timer -> RR = true); // Regional Radar
-		new FlxTimer().start(21, timer -> DR = true); // Doppler Radar
-		new FlxTimer().start(28, timer -> LF = true);
-
-		// Local Forecast Text switching
-		// I'm aware of how messy this is, but this is legit something that needs to be done so I can
-		// avoid the FPS going to hell.
-		// ^^ see https://github.com/Zeexel/OpenStar/commit/59891df5683bdd80707f6fd9d7f95c1b88ccf907 line 590.
-
-		// The timers for these are usually decided by the narration and when it completes,
-		// but we don't have any of the full out LF narrations. So, for now they're about 7 seconds each.
-		new FlxTimer().start(28, timer -> LF_0 = true);
-		new FlxTimer().start(35, timer -> LF_1 = true);
-		new FlxTimer().start(42, timer -> LF_2 = true);
-		new FlxTimer().start(49, timer -> LF_3 = true);
-		new FlxTimer().start(56, timer -> LF_4 = true);
-
-		// Back to panels, then we're done!
-		new FlxTimer().start(63, timer -> TWA = true);
-		new FlxTimer().start(70, timer -> finished = true);
+		new FlxTimer().start(0, timer -> CURRENT_CONDITIONS = true);
+		new FlxTimer().start(timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
+		new FlxTimer().start(timers[1].time + 7, timer -> REGIONAL_RADAR = true);
+		new FlxTimer().start(timers[2].time + 7, timer -> ALMANAC = true);
+		new FlxTimer().start(timers[3].time + 7, timer -> AIR_QUALITY = true);
+		new FlxTimer().start(timers[4].time + 7, timer -> OUTDOOR_ACTIVITY = true);
+		new FlxTimer().start(timers[5].time + 7, timer -> DAYPART_FORECAST = true);
+		new FlxTimer().start(timers[6].time + 7, timer -> REGIONAL_FORECAST = true);
+		new FlxTimer().start(timers[7].time + 7, timer -> LF = true);
+		// local forecast text switches
+		new FlxTimer().start(timers[8].time, timer -> LF_0 = true);
+		new FlxTimer().start(timers[9].time + 7, timer -> LF_1 = true);
+		new FlxTimer().start(timers[10].time + 7, timer -> LF_2 = true);
+		new FlxTimer().start(timers[11].time + 7, timer -> LF_3 = true);
+		new FlxTimer().start(timers[12].time + 7, timer -> LF_4 = true);
+		new FlxTimer().start(timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
+		new FlxTimer().start(101, timer -> finished = true);
 	}
 
 	// Everything in this function will be called every frame
@@ -571,7 +575,7 @@ class PresentationState extends FlxState
 
 		// LOT8
 		// Current Conditions
-		if (CC == true)
+		if (CURRENT_CONDITIONS == true)
 		{
 			trace("CC IS TRUE!!!");
 			ccPanel.alpha += 0.1;
@@ -593,12 +597,12 @@ class PresentationState extends FlxState
 				ccTitle.alpha = 1;
 				ccIcon.alpha = 1;
 				baroArrow.alpha = 1;
-				CC = false;
+				CURRENT_CONDITIONS = false;
 			}
 		}
 
 		// Current Conditions Fadeout
-		if (CCFO == true)
+		if (REGIONAL_OBSERVATIONS == true)
 		{
 			trace("FADING OUT OF CURRENT CONDITIONS");
 
@@ -619,12 +623,12 @@ class PresentationState extends FlxState
 				remove(ccPanel);
 				remove(ccIcon);
 				remove(baroArrow);
-				CCFO = false;
+				REGIONAL_OBSERVATIONS = false;
 			}
 		}
 
 		// Regional Radar
-		if (RR == true)
+		if (REGIONAL_RADAR == true)
 		{
 			trace("REGIONAL RADAR");
 			rrTitle.alpha += 0.1;
@@ -636,26 +640,7 @@ class PresentationState extends FlxState
 			if (rrTitle.alpha >= 1)
 			{
 				rrTitle.alpha = 1;
-				RR = false;
-			}
-		}
-		// Doppler Radar
-		if (DR == true)
-		{
-			trace("DOPPLER RADAR FADE IN");
-
-			drTitle.alpha += 0.1;
-			rrTitle.alpha -= 0.1;
-
-			if (rrTitle.alpha == 0)
-			{
-				remove(rrTitle);
-			}
-
-			if (drTitle.alpha >= 1)
-			{
-				drTitle.alpha = 1;
-				DR = false;
+				REGIONAL_RADAR = false;
 			}
 		}
 
@@ -775,7 +760,7 @@ class PresentationState extends FlxState
 		}
 
 		// The Week Ahead!
-		if (TWA == true)
+		if (THE_WEEK_AHEAD == true)
 		{
 			if (DOWTXT.members[4] != null)
 			{
@@ -814,10 +799,8 @@ class PresentationState extends FlxState
 				}
 			}
 
-			// TODO: 7-Day Outlook code
-
 			if (twaTitle.alpha >= 1)
-				TWA = false;
+				THE_WEEK_AHEAD = false;
 		}
 
 		// Clean up and GTFO

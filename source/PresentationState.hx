@@ -15,6 +15,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxGradient;
 import flixel.util.FlxGradient;
 import flixel.util.FlxTimer;
+import haxe.Timer;
 import haxe.io.Path;
 import lime.app.Future;
 import lime.math.BGRA;
@@ -121,10 +122,14 @@ class PresentationState extends FlxState
 
 	private var finished:Bool;
 
+	private var PresentationTimers:FlxTimerManager;
+
 	private var LDL:LowerDisplayLine;
 
 	override public function create():Void
 	{
+		this.PresentationTimers = new FlxTimerManager();
+
 		FlxG.mouse.visible = false;
 		FlxG.autoPause = false; // Disable the program pausing when the window is out of focus
 		FlxG.sound.muteKeys = null;
@@ -514,10 +519,10 @@ class PresentationState extends FlxState
 		else
 			trace("Skipping local vocal initalization because it's false..");
 
-		createPresentationTimers();
-
 		LDL = new LowerDisplayLine(FlxColor.TRANSPARENT);
 		openSubState(LDL);
+
+		createPresentationTimers();
 	}
 
 	function makeMusicPL():Array<String>
@@ -542,42 +547,32 @@ class PresentationState extends FlxState
 
 	function createPresentationTimers():Void // Real units keep all of these within 2 Minutes (120 seconds), so everything should be at 7-second intervals.
 	{
-		var timers:Array<FlxTimer> = FlxTimer.globalManager._timers;
-		trace("Created Presentation Timers");
-		new FlxTimer().start(0, timer -> CURRENT_CONDITIONS = true);
-		new FlxTimer().start(timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
-		new FlxTimer().start(timers[1].time + 7, timer -> REGIONAL_RADAR = true);
-		new FlxTimer().start(timers[2].time + 7, timer -> ALMANAC = true);
-		new FlxTimer().start(timers[3].time + 7, timer -> AIR_QUALITY = true);
-		new FlxTimer().start(timers[4].time + 7, timer -> OUTDOOR_ACTIVITY = true);
-		new FlxTimer().start(timers[5].time + 7, timer -> DAYPART_FORECAST = true);
-		new FlxTimer().start(timers[6].time + 7, timer -> REGIONAL_FORECAST = true);
-		new FlxTimer().start(timers[7].time + 7, timer -> LF = true);
-		// local forecast text switches
-		new FlxTimer().start(timers[8].time, timer -> LF_0 = true);
-		new FlxTimer().start(timers[9].time + 7, timer -> LF_1 = true);
-		new FlxTimer().start(timers[10].time + 7, timer -> LF_2 = true);
-		new FlxTimer().start(timers[11].time + 7, timer -> LF_3 = true);
-		new FlxTimer().start(timers[12].time + 7, timer -> LF_4 = true);
-		new FlxTimer().start(timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
-		new FlxTimer().start(101, timer -> finished = true);
+		// TODO: Find some way to automate the creation of these timers, this is kinda rediculous.
+		// Using a for loop wont work for some reason
+		new FlxTimer(PresentationTimers).start(0, timer -> CURRENT_CONDITIONS = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[1].time + 7, timer -> REGIONAL_RADAR = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[2].time + 7, timer -> ALMANAC = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[3].time + 7, timer -> AIR_QUALITY = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[4].time + 7,
+			timer -> OUTDOOR_ACTIVITY = true); // TODO: Handle this somehow in panel logic
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[5].time + 7, timer -> DAYPART_FORECAST = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[6].time + 7,
+			timer -> REGIONAL_FORECAST = true); // TODO: Needs to be handled in panel logic
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[7].time + 7, timer -> LF = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[8].time, timer -> LF_0 = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[9].time + 7, timer -> LF_1 = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[10].time + 7, timer -> LF_2 = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[11].time + 7, timer -> LF_3 = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[12].time + 7, timer -> LF_4 = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
+		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[14].time + 7, timer -> finished = true);
 	}
 
-	// Everything in this function will be called every frame
-	// Remember to destroy your timers!
-	override public function update(elapsed):Void
+	function presentationLogic():Void
 	{
-		// Lower audio when any of the local vocals are playing
-		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
-			FlxG.sound.music.volume = 0.1;
-		else
-			FlxG.sound.music.volume = 0.8;
-
-		// LOT8
-		// Current Conditions
 		if (CURRENT_CONDITIONS == true)
 		{
-			trace("CC IS TRUE!!!");
 			ccPanel.alpha += 0.1;
 			ccTitle.alpha += 0.1;
 			ccIcon.alpha += 0.1;
@@ -599,208 +594,6 @@ class PresentationState extends FlxState
 				baroArrow.alpha = 1;
 				CURRENT_CONDITIONS = false;
 			}
-		}
-
-		// Current Conditions Fadeout
-		if (REGIONAL_OBSERVATIONS == true)
-		{
-			trace("FADING OUT OF CURRENT CONDITIONS");
-
-			ccPanel.alpha -= 0.3;
-			ccIcon.alpha -= 0.3;
-			baroArrow.alpha -= 0.3;
-
-			for (i in 0...CCTXT.members.length)
-			{
-				CCTXT.members[i].alpha -= 0.3;
-
-				if (CCTXT.members[i].alpha == 0)
-					remove(CCTXT);
-			}
-
-			if (ccPanel.alpha == 0)
-			{
-				remove(ccPanel);
-				remove(ccIcon);
-				remove(baroArrow);
-				REGIONAL_OBSERVATIONS = false;
-			}
-		}
-
-		// Regional Radar
-		if (REGIONAL_RADAR == true)
-		{
-			trace("REGIONAL RADAR");
-			rrTitle.alpha += 0.1;
-			ccTitle.alpha -= 0.3;
-
-			if (ccTitle.alpha == 0)
-				remove(ccTitle);
-
-			if (rrTitle.alpha >= 1)
-			{
-				rrTitle.alpha = 1;
-				REGIONAL_RADAR = false;
-			}
-		}
-
-		// LOCAL FORECAST
-		if (LF == true)
-		{
-			lfTitle.alpha += 0.1;
-			lfPanel.alpha += 0.1;
-			lf_cityName.alpha += 0.1;
-			drTitle.alpha -= 0.3;
-
-			if (drTitle.alpha == 0)
-			{
-				remove(drTitle);
-			}
-
-			if (lfTitle.alpha >= 1)
-			{
-				lfTitle.alpha = 1;
-				lfPanel.alpha = 1;
-				lf_cityName.alpha = 1;
-				LF = false;
-			}
-		}
-
-		if (LF_0 == true)
-		{
-			DOWTXT.members[0].alpha += 0.1;
-			NARRATIVES.members[0].alpha += 0.1;
-
-			if (DOWTXT.members[0].alpha >= 1)
-				LF_0 = false;
-		}
-
-		if (LF_1 == true)
-		{
-			if (DOWTXT.members[0] != null)
-			{
-				DOWTXT.members[0].alpha -= 0.3;
-				NARRATIVES.members[0].alpha -= 0.3;
-
-				if (DOWTXT.members[0].alpha == 0)
-				{
-					DOWTXT.remove(DOWTXT.members[0]);
-					NARRATIVES.remove(NARRATIVES.members[0]);
-				}
-			}
-
-			DOWTXT.members[1].alpha += 0.1;
-			NARRATIVES.members[1].alpha += 0.1;
-
-			if (DOWTXT.members[1].alpha >= 1)
-				LF_1 = false;
-		}
-
-		if (LF_2 == true)
-		{
-			if (DOWTXT.members[1] != null)
-			{
-				DOWTXT.members[1].alpha -= 0.3;
-				NARRATIVES.members[1].alpha -= 0.3;
-
-				if (DOWTXT.members[1].alpha == 0)
-				{
-					DOWTXT.remove(DOWTXT.members[1]);
-					NARRATIVES.remove(NARRATIVES.members[1]);
-				}
-			}
-
-			DOWTXT.members[2].alpha += 0.1;
-			NARRATIVES.members[2].alpha += 0.1;
-
-			if (DOWTXT.members[2].alpha >= 1)
-				LF_2 = false;
-		}
-
-		if (LF_3 == true)
-		{
-			if (DOWTXT.members[2] != null)
-			{
-				DOWTXT.members[2].alpha -= 0.3;
-				NARRATIVES.members[2].alpha -= 0.3;
-
-				if (DOWTXT.members[2].alpha == 0)
-				{
-					DOWTXT.remove(DOWTXT.members[2]);
-					NARRATIVES.remove(NARRATIVES.members[2]);
-				}
-			}
-
-			DOWTXT.members[3].alpha += 0.1;
-			NARRATIVES.members[3].alpha += 0.1;
-
-			if (DOWTXT.members[3].alpha >= 1)
-				LF_3 = false;
-		}
-
-		if (LF_4 == true)
-		{
-			if (DOWTXT.members[3] != null)
-			{
-				DOWTXT.members[3].alpha -= 0.3;
-				NARRATIVES.members[3].alpha -= 0.3;
-
-				if (DOWTXT.members[3].alpha == 0)
-				{
-					DOWTXT.remove(DOWTXT.members[3]);
-					NARRATIVES.remove(NARRATIVES.members[3]);
-				}
-			}
-
-			DOWTXT.members[4].alpha += 0.1;
-			NARRATIVES.members[4].alpha += 0.1;
-
-			if (DOWTXT.members[4].alpha >= 1)
-				LF_4 = false;
-		}
-
-		// The Week Ahead!
-		if (THE_WEEK_AHEAD == true)
-		{
-			if (DOWTXT.members[4] != null)
-			{
-				DOWTXT.members[4].alpha -= 0.3;
-				NARRATIVES.members[4].alpha -= 0.3;
-				lfTitle.alpha -= 0.3;
-				lfPanel.alpha -= 0.3;
-
-				if (DOWTXT.members[4].alpha == 0)
-				{
-					remove(DOWTXT);
-					remove(NARRATIVES);
-					remove(lfTitle);
-					remove(lfPanel);
-				}
-			}
-
-			twaPanel.alpha += 0.1;
-			twaTitle.alpha += 0.1;
-
-			for (i in 0...twaDays.members.length)
-			{
-				twaDays.members[i].alpha += 0.1;
-				twaWeekend.members[i].alpha += 0.1;
-				twaHiTemps.members[i].alpha += 0.1;
-				twaLoTemps.members[i].alpha += 0.1;
-				twaIcons.members[i].alpha += 0.1;
-
-				if (twaDays.members[i].alpha >= 1)
-				{
-					twaDays.members[i].alpha = 1;
-					twaWeekend.members[i].alpha = 1;
-					twaHiTemps.members[i].alpha = 1;
-					twaLoTemps.members[i].alpha = 1;
-					twaIcons.members[i].alpha = 1;
-				}
-			}
-
-			if (twaTitle.alpha >= 1)
-				THE_WEEK_AHEAD = false;
 		}
 
 		// Clean up and GTFO
@@ -847,6 +640,22 @@ class PresentationState extends FlxState
 				FlxG.switchState(new BroadcastState());
 			}
 		}
+	}
+
+	// Everything in this function will be called every frame
+	// Remember to destroy your timers!
+	override public function update(elapsed):Void
+	{
+		// Lower audio when any of the local vocals are playing
+		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
+			FlxG.sound.music.volume = 0.1;
+		else
+			FlxG.sound.music.volume = 0.8;
+
+		if (PresentationTimers.active)
+			PresentationTimers.update(elapsed);
+
+		presentationLogic();
 
 		super.update(elapsed);
 	}

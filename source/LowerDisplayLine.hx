@@ -85,15 +85,7 @@ class LowerDisplayLine extends FlxSubState
 		LDL_ccTxt.visible = false;
 		add(LDL_ccTxt);
 
-		if (FileSystem.exists(Resources.icon(APIHandler._CCVARS.ccIconCode)))
-		{
-			CCIcon = new FlxSprite(1020, 950).loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
-		}
-		else
-		{
-			trace('FAILED TO FIND ICON CODE ${APIHandler._CCVARS.ccIconCode}, DEFAULTING TO N/A ICON');
-			CCIcon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
-		}
+		CCIcon = new FlxSprite(1020, 950).loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode));
 
 		CCIcon.scale.x = 0.8;
 		CCIcon.scale.y = 0.8;

@@ -28,7 +28,7 @@ typedef LOCATIONDATA =
 
 typedef CCVARS =
 {
-	var ccIconCode:String;
+	var ccIconCode:Int;
 	var currentCondition:String;
 	var windSpd:String; // Put as a string due to the getCC function returning the wind direction
 	var temperature:Int;
@@ -36,6 +36,7 @@ typedef CCVARS =
 	var relHumidity:Int;
 	var baroPressure:Float;
 	var baroTrend:String;
+	var visibility:Float;
 }
 
 typedef FORECASTDATA =
@@ -135,7 +136,8 @@ class APIHandler
 				dewpoint: res.temperatureDewPoint,
 				relHumidity: res.relativeHumidity,
 				baroPressure: res.pressureAltimeter,
-				baroTrend: res.pressureTendencyTrend
+				baroTrend: res.pressureTendencyTrend,
+				visibility: res.visibility
 			};
 		}
 

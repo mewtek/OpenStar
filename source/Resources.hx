@@ -1,5 +1,7 @@
 package;
 
+import sys.FileSystem;
+
 // This class works as a file name shortener for loading graphics
 // and audio files.
 class Resources
@@ -9,9 +11,14 @@ class Resources
 		return 'assets/images/$lib/$file.png';
 	}
 
-	public static function icon(id:String) // Used for current conditons & TWA icons
+	public static function icon(code:Int)
 	{
-		return 'assets/images/cc_icons/$id.png';
+		var codeStr = Std.string(code);
+
+		if (FileSystem.exists('assets/images/cc_icons/$codeStr.png'))
+			return 'assets/images/cc_icons/$codeStr.png';
+		else
+			return 'assets/images/cc_icons/44.png';
 	}
 
 	public static function narration(file:String, lib:String)

@@ -117,6 +117,8 @@ class PresentationState extends FlxState
 
 	private var LDL:LowerDisplayLine;
 
+	private var CC_PANEL:CurrentConditions;
+
 	override public function create():Void
 	{
 		this.PresentationTimers = new FlxTimerManager();
@@ -273,23 +275,8 @@ class PresentationState extends FlxState
 
 		// Panel logic
 
-		// Current condtions
-
-		// check to see if an icon exists
-		if (FileSystem.exists(Resources.icon(APIHandler._CCVARS.ccIconCode)))
-		{
-			ccIcon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode), false);
-		}
-		else
-		{
-			trace('FAILED TO FIND ICON CODE ${APIHandler._CCVARS.ccIconCode}, DEFAULTING TO N/A ICON');
-			ccIcon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
-		}
-
-		ccIcon.scale.set(1.7, 1.7);
-		ccIcon.updateHitbox();
-		ccIcon.setPosition(268, 320);
-		ccIcon.antialiasing = true;
+		CC_PANEL = new CurrentConditions();
+		add(CC_PANEL);
 
 		// create barometric pressure trend graphic
 		switch (APIHandler._CCVARS.baroTrend)
@@ -316,69 +303,7 @@ class PresentationState extends FlxState
 		baroArrow.alpha = 0;
 		add(baroArrow);
 
-		// Text elements
-		CCTXT = new FlxTypedGroup<FlxText>();
 
-		cc_cityName = new FlxText(150, 176, 0, APIHandler._LOCATIONDATA.cityName.toUpperCase());
-		condTxt = new FlxText(275, 550, 200, APIHandler._CCVARS.currentCondition);
-		tmpTxt = new FlxText(260, 725, 225, '${APIHandler._CCVARS.temperature}');
-		rhTxt = new FlxText(1200, 265, 255, '${APIHandler._CCVARS.relHumidity}%');
-		dpTxt = new FlxText(1200, 365, 500, '${APIHandler._CCVARS.dewpoint}°');
-		baroTxt = new FlxText(1200, 465, 500, '${APIHandler._CCVARS.baroPressure}');
-		visTxt = new FlxText(1200, 565, 500, 'N/A');
-		wndTxt = new FlxText(1200, 665, 500, '${APIHandler._CCVARS.windSpd}');
-		gustTxt = new FlxText(1200, 765, 500, 'None');
-
-		condTxt.setFormat(Resources.font('interstate-bold'), 50, FlxColor.WHITE, CENTER);
-		tmpTxt.setFormat(Resources.font('interstate-bold'), 115, CENTER);
-		cc_cityName.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
-
-		rhTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-		dpTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-		baroTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-		visTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-		wndTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-		gustTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-
-		rhLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		dpLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		dpLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		baroLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		visLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		wndLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-		gustLabel.setFormat(Resources.font('interstate-regular'), 60, FlxColor.WHITE, RIGHT);
-
-		CCTXT.add(cc_cityName);
-
-		CCTXT.add(condTxt);
-		CCTXT.add(tmpTxt);
-		CCTXT.add(rhTxt);
-		CCTXT.add(dpTxt);
-		CCTXT.add(baroTxt);
-		CCTXT.add(visTxt);
-		CCTXT.add(wndTxt);
-		CCTXT.add(gustTxt);
-
-		// add labels
-		CCTXT.add(rhLabel);
-		CCTXT.add(dpLabel);
-		CCTXT.add(baroLabel);
-		CCTXT.add(visLabel);
-		CCTXT.add(wndLabel);
-		CCTXT.add(gustLabel);
-
-		// add graphical elements
-		add(ccIcon);
-
-		// set alpha + enable antialiasing
-		for (i in 0...CCTXT.members.length)
-		{
-			CCTXT.members[i].antialiasing = true;
-			CCTXT.members[i].alpha = 0;
-		}
-		ccIcon.alpha = 0;
-
-		add(CCTXT);
 
 		// 7-Day Outlook
 		twaIcons = new FlxTypedGroup<FlxSprite>();
@@ -392,23 +317,23 @@ class PresentationState extends FlxState
 		{
 			// Icons
 			var icon:FlxSprite;
-			if (FileSystem.exists(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i])))
-			{
-				icon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i]), false);
-			}
-			else
-			{
-				trace('FAILED TO FIND ICON CODE ${APIHandler._SEVENDAYDATA.iconCodes[i]}, DEFAULTING TO N/A ICON');
-				icon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
-			}
+			// if (FileSystem.exists(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i])))
+			// {
+			// 	icon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i]), false);
+			// }
+			// else
+			// {
+			// 	trace('FAILED TO FIND ICON CODE ${APIHandler._SEVENDAYDATA.iconCodes[i]}, DEFAULTING TO N/A ICON');
+			// 	icon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
+			// }
 
-			icon.antialiasing = true;
-			icon.scale.x = 1.5;
-			icon.scale.y = 1.5;
-			icon.updateHitbox();
-			icon.setPosition((twaIcons.members[i - 1] != null ? twaIcons.members[i - 1].x + 235 : 160), 330);
-			icon.ID = i;
-			twaIcons.add(icon);
+			// icon.antialiasing = true;
+			// icon.scale.x = 1.5;
+			// icon.scale.y = 1.5;
+			// icon.updateHitbox();
+			// icon.setPosition((twaIcons.members[i - 1] != null ? twaIcons.members[i - 1].x + 235 : 160), 330);
+			// icon.ID = i;
+			// twaIcons.add(icon);
 
 			// Hi/Lo Temperature Labels
 			var hiTemp:FlxText;
@@ -450,7 +375,7 @@ class PresentationState extends FlxState
 			twaWeekend.members[i].alpha = 0;
 			twaHiTemps.members[i].alpha = 0;
 			twaLoTemps.members[i].alpha = 0;
-			twaIcons.members[i].alpha = 0;
+			// twaIcons.members[i].alpha = 0;
 		}
 
 		add(twaIcons);
@@ -602,44 +527,44 @@ class PresentationState extends FlxState
 
 		// Alot of this is just copy and paste code, most of the panel creation and logic is handled in create()
 
-		if (CURRENT_CONDITIONS)
-		{
-			ccPanel.alpha += 0.1;
-			ccTitle.alpha += 0.1;
-			ccIcon.alpha += 0.1;
-			baroArrow.alpha += 0.1;
+		// if (CURRENT_CONDITIONS)
+		// {
+		// 	ccPanel.alpha += 0.1;
+		// 	ccTitle.alpha += 0.1;
+		// 	ccIcon.alpha += 0.1;
+		// 	baroArrow.alpha += 0.1;
 
-			for (i in 0...CCTXT.members.length)
-			{
-				CCTXT.members[i].alpha += 0.1;
+		// 	for (i in 0...CCTXT.members.length)
+		// 	{
+		// 		CCTXT.members[i].alpha += 0.1;
 
-				if (CCTXT.members[i].alpha >= 1)
-					CCTXT.members[i].alpha = 1;
-			}
+		// 		if (CCTXT.members[i].alpha >= 1)
+		// 			CCTXT.members[i].alpha = 1;
+		// 	}
 
-			if (ccPanel.alpha >= 1)
-			{
-				ccPanel.alpha = 1;
-				ccTitle.alpha = 1;
-				ccIcon.alpha = 1;
-				baroArrow.alpha = 1;
-				CURRENT_CONDITIONS = false;
-			}
-		}
+		// 	if (ccPanel.alpha >= 1)
+		// 	{
+		// 		ccPanel.alpha = 1;
+		// 		ccTitle.alpha = 1;
+		// 		ccIcon.alpha = 1;
+		// 		baroArrow.alpha = 1;
+		// 		CURRENT_CONDITIONS = false;
+		// 	}
+		// }
 
 		if (REGIONAL_OBSERVATIONS)
 		{
-			ccPanel.alpha -= 0.1;
-			ccIcon.alpha -= 0.1;
-			baroArrow.alpha -= 0.1;
+			// ccPanel.alpha -= 0.1;
+			// // ccIcon.alpha -= 0.1;
+			// baroArrow.alpha -= 0.1;
 
-			for (i in 0...CCTXT.members.length)
-			{
-				CCTXT.members[i].alpha -= 0.1;
+			// for (i in 0...CCTXT.members.length)
+			// {
+			// 	CCTXT.members[i].alpha -= 0.1;
 
-				if (CCTXT.members[i].alpha == 0)
-					remove(CCTXT);
-			}
+			// 	if (CCTXT.members[i].alpha == 0)
+			// 		remove(CCTXT);
+			// }
 
 			if (ccPanel.alpha == 0)
 			{

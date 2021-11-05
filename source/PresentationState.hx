@@ -152,13 +152,13 @@ class PresentationState extends FlxState
 			add(BG);
 		}
 
-		makeMusicPL();
+		// makeMusicPL();
 
-		if (FlxG.sound.music == null)
-		{
-			FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
-			FlxG.sound.music.persist = false;
-		}
+		// if (FlxG.sound.music == null)
+		// {
+		// 	FlxG.sound.playMusic(Resources.music(HelpfulFunctions.fromArray(music_playlist)), 0.8, false);
+		// 	FlxG.sound.music.persist = false;
+		// }
 
 		// create map
 		// map = new FlxSprite(0, 0);
@@ -171,6 +171,10 @@ class PresentationState extends FlxState
 		// add(map);
 
 		// CREATE PANEL TITLES \\
+
+		// TITLE GEN TESTING
+		var CC_TEST_TITLE:Title = new Title('black', 'white');
+		add(CC_TEST_TITLE);
 
 		// Title Textures
 
@@ -513,7 +517,7 @@ class PresentationState extends FlxState
 		LDL = new LowerDisplayLine(FlxColor.TRANSPARENT);
 		openSubState(LDL);
 
-		createPresentationTimers();
+		// createPresentationTimers();
 	}
 
 	function makeMusicPL():Array<String>
@@ -538,37 +542,60 @@ class PresentationState extends FlxState
 
 	function createPresentationTimers():Void // Real units keep all of these within 2 Minutes (120 seconds), so everything should be at 7-second intervals.
 	{
+		var timers:Array<FlxTimer> = [];
 		// TODO: Find some way to automate the creation of these timers, this is kinda rediculous.
 		// Using a for loop wont work for some reason
-		new FlxTimer(PresentationTimers).start(0, timer -> CURRENT_CONDITIONS = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[1].time + 7, timer -> REGIONAL_RADAR = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[2].time + 7, timer -> ALMANAC = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[3].time + 7, timer -> AIR_QUALITY = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[4].time + 7,
-			timer -> OUTDOOR_ACTIVITY = true); // TODO: Handle this somehow in panel logic
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[5].time + 7, timer -> DAYPART_FORECAST = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[6].time + 7,
-			timer -> REGIONAL_FORECAST = true); // TODO: Needs to be handled in panel logic
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[7].time + 7, timer -> LF = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[8].time, timer -> LF_0 = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[9].time + 7, timer -> LF_1 = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[10].time + 7, timer -> LF_2 = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[11].time + 7, timer -> LF_3 = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[12].time + 7, timer -> LF_4 = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
-		new FlxTimer(PresentationTimers).start(PresentationTimers._timers[14].time + 7, timer -> finished = true);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+		new FlxTimer(PresentationTimers);
+
+
+		PresentationTimers.forEach(function(tmr:FlxTimer)
+		{
+			timers.push(tmr);
+		});
+
+
+		timers[0].start(0, timer -> CURRENT_CONDITIONS = true);
+		timers[1].start(timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
+		timers[2].start(timers[1].time + 7, timer -> REGIONAL_RADAR = true);
+		timers[3].start(timers[2].time + 7, timer -> ALMANAC = true);
+		timers[4].start(timers[3].time + 7, timer -> AIR_QUALITY = true);
+		timers[5].start(timers[4].time + 7, timer -> OUTDOOR_ACTIVITY = true); // TODO: Handle this somehow in panel logic
+		timers[6].start(timers[5].time + 7, timer -> DAYPART_FORECAST = true);
+		timers[7].start(timers[6].time + 7, timer -> REGIONAL_FORECAST = true);
+		timers[8].start(timers[7].time + 7, timer -> LF = true);
+		timers[9].start(timers[8].time, timer -> LF_0 = true);
+		timers[10].start(timers[9].time + 7, timer -> LF_1 = true);
+		timers[11].start(timers[10].time + 7, timer -> LF_2 = true);
+		timers[12].start(timers[11].time + 7, timer -> LF_3 = true);
+		timers[13].start(timers[12].time + 7, timer -> LF_4 = true);
+		timers[14].start(timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
+		timers[15].start(timers[14].time + 7, timer -> finished = true);
 	}
 
 	// Everything in this function will be called every frame
 	// Remember to destroy your timers!
 	override public function update(elapsed):Void
 	{
-		// Lower audio when any of the local vocals are playing
-		if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
-			FlxG.sound.music.volume = 0.1;
-		else
-			FlxG.sound.music.volume = 0.8;
+		// // Lower audio when any of the local vocals are playing
+		// if (LOCALVOCAL_INTRO.playing || LOCALVOCAL_TMP.playing || LOCALVOCAL_CC.playing && FlxG.sound.music != null)
+		// 	FlxG.sound.music.volume = 0.1;
+		// else
+		// 	FlxG.sound.music.volume = 0.8;
 
 		if (PresentationTimers.active)
 			PresentationTimers.update(elapsed);

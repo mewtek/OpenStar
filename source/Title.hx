@@ -32,11 +32,11 @@ class Title extends FlxSpriteGroup
         
         GRADIENT_BLACK.scale.set(0.65, 0.65);
         GRADIENT_BLACK.setPosition(50, -58);
-        // add(GRADIENT_BLACK);
+        add(GRADIENT_BLACK);
 
         GRADIENT_WHITE.scale.set(0.65, 0.65);
         GRADIENT_WHITE.setPosition(265, -55);
-        // add(GRADIENT_WHITE);
+        add(GRADIENT_WHITE);
 
         TITLE_BORDER.scale.set(0.65, 0.65);
         TITLE_BORDER.setPosition(-174, -58);       
@@ -46,18 +46,16 @@ class Title extends FlxSpriteGroup
         // create text
         blackTxt = new FlxText(150, 55);
         blackTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-        blackTxt.text = "current";
+        blackTxt.text = text_black;
         add(blackTxt);
 
         whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 55);
         whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
-        whiteTxt.text = "conditions";
+        whiteTxt.text = text_white;
         add(whiteTxt); 
 
 
-        // GRADIENT_BLACK.width = Std.int(blackTxt.fieldWidth);
-        // GRADIENT_BLACK.x = blackTxt.fieldWidth - 305;
-
+    
         forEach(sprite -> sprite.antialiasing = true);
     }
 }

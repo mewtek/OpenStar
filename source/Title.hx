@@ -21,13 +21,14 @@ class Title extends FlxSpriteGroup
     var blackTxt_shadow:FlxText;
     var whiteTxt:FlxText;
 
-    public function new(text_black:String, text_white:String, ?isRadarTitle:Bool = false)
+    public function new(text_black:String, ?text_white:String, ?isRadarTitle:Bool = false)
     {
         super();
 
         TITLE_BORDER = new FlxSprite().loadGraphic('assets/images/titles/title-parts/TITLE_BORDER.png');
         GRADIENT_BLACK = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_BLACK'));
         GRADIENT_WHITE = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_WHITE'));
+
 
         // Set sizes and positions
         
@@ -40,9 +41,12 @@ class Title extends FlxSpriteGroup
         GRADIENT_BLACK.setPosition(-10, -58);
         // add(GRADIENT_BLACK);
 
-        GRADIENT_WHITE.scale.set(0.65, 0.65);
-        GRADIENT_WHITE.setPosition(265, -62);
-        add(GRADIENT_WHITE);
+        if (text_white != null)
+        {
+            GRADIENT_WHITE.scale.set(0.65, 0.65);
+            GRADIENT_WHITE.setPosition(0, -62);
+            add(GRADIENT_WHITE);
+        }
 
 
         // create text
@@ -51,18 +55,21 @@ class Title extends FlxSpriteGroup
         blackTxt_shadow.text = text_black;
         add(blackTxt_shadow);
 
+
         blackTxt = new FlxText(150, 50);
         blackTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
         blackTxt.text = text_black;
         add(blackTxt);
 
+        if(text_white != null)
+        {
+            whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 50);
+            whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
+            whiteTxt.text = text_white;
+            GRADIENT_WHITE.x = whiteTxt.x - 218;
+            add(whiteTxt); 
+        }
 
-        whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 50);
-        whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
-        whiteTxt.text = text_white;
-        add(whiteTxt); 
-
-        GRADIENT_WHITE.x = whiteTxt.x - 218; 
     
         forEach(sprite -> sprite.antialiasing = true);
     }

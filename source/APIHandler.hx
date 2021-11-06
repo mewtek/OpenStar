@@ -47,7 +47,7 @@ typedef FORECASTDATA =
 
 typedef SEVENDAYDATA =
 {
-	var iconCodes:Array<String>;
+	var iconCodes:Array<Int>;
 	var hiTemps:Array<String>;
 	var loTemps:Array<String>;
 	var dow:Array<String>;
@@ -162,7 +162,7 @@ class APIHandler
 		var narratives:Array<String> = [];
 
 		// For 7-day outlook
-		var ICONS:Array<String> = [];
+		var ICONS:Array<Int> = [];
 		var HI:Array<String> = [];
 		var LO:Array<String> = [];
 		var DOW:Array<String> = [];
@@ -194,7 +194,7 @@ class APIHandler
 			// 7-Day outlook!
 			for (i in 0...res.dayOfWeek.length)
 			{
-				ICONS.push('44'); // TODO: Figure out icons
+				ICONS.push(44); // TODO: Figure out icons
 
 				if (res.calendarDayTemperatureMax[i] != null)
 					HI.push('${res.calendarDayTemperatureMax[i]}');

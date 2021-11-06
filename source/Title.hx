@@ -18,6 +18,7 @@ class Title extends FlxSpriteGroup
 
     // Text
     var blackTxt:FlxText;
+    var blackTxt_shadow:FlxText;
     var whiteTxt:FlxText;
 
     public function new(text_black:String, text_white:String, ?isRadarTitle:Bool = false)
@@ -30,31 +31,38 @@ class Title extends FlxSpriteGroup
 
         // Set sizes and positions
         
+        TITLE_BORDER.scale.set(0.65, 0.65);
+        TITLE_BORDER.updateHitbox();
+        TITLE_BORDER.setPosition(140, -18);       
+        add(TITLE_BORDER);
+
         GRADIENT_BLACK.scale.set(0.65, 0.65);
-        GRADIENT_BLACK.setPosition(50, -58);
-        add(GRADIENT_BLACK);
+        GRADIENT_BLACK.setPosition(-10, -58);
+        // add(GRADIENT_BLACK);
 
         GRADIENT_WHITE.scale.set(0.65, 0.65);
-        GRADIENT_WHITE.setPosition(265, -55);
+        GRADIENT_WHITE.setPosition(265, -62);
         add(GRADIENT_WHITE);
-
-        TITLE_BORDER.scale.set(0.65, 0.65);
-        TITLE_BORDER.setPosition(-174, -58);       
-        add(TITLE_BORDER);
 
 
         // create text
-        blackTxt = new FlxText(150, 55);
+        blackTxt_shadow = new FlxText(152, 53.2);
+        blackTxt_shadow.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
+        blackTxt_shadow.text = text_black;
+        add(blackTxt_shadow);
+
+        blackTxt = new FlxText(150, 50);
         blackTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
         blackTxt.text = text_black;
         add(blackTxt);
 
-        whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 55);
+
+        whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 50);
         whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
         whiteTxt.text = text_white;
         add(whiteTxt); 
 
-
+        GRADIENT_WHITE.x = whiteTxt.x - 218; 
     
         forEach(sprite -> sprite.antialiasing = true);
     }

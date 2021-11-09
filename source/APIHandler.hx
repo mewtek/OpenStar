@@ -179,7 +179,10 @@ class APIHandler
 				{
 					names.push(res.daypart[0].daypartName[i]);
 					narratives.push(res.daypart[0].narrative[i]);
+					
+					#if debug
 					trace(res.daypart[0].daypartName[i] + ": " + res.daypart[0].narrative[i]);
+					#end
 
 					if (res.daypart[0].narrative[i] == null)
 						narratives.push("Forecast not available.");

@@ -125,7 +125,35 @@ class CurrentConditions extends FlxSpriteGroup
         
 
 
-        forEach(sprite -> sprite.antialiasing = true);
+        forEach(sprite -> {sprite.antialiasing = true; sprite.alpha = 0;});
 
+    }
+    
+    public inline function fadeOut()
+    {
+        if(panel != null)
+        {
+            forEach(function(spr)
+            {
+                if (spr.alpha != 0)
+                    spr.alpha -= 0.3;
+                else
+                    remove(spr);
+            });
+        }
+    }
+
+    public inline function fadeIn()
+    {
+        if(panel != null)
+        {
+            forEach(function(spr)
+            {
+                if(spr.alpha >= 1)
+                    spr.alpha = 1;
+                else
+                    spr.alpha += 0.1;
+            });
+        }
     }
 }

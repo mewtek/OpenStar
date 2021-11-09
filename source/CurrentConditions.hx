@@ -36,6 +36,10 @@ class CurrentConditions extends FlxSpriteGroup
     var gstTxt:FlxText;
 
 
+    public var fadedIn:Bool;
+    public var fadedOut:Bool;
+
+
     public function new()
     {
         super();
@@ -150,7 +154,10 @@ class CurrentConditions extends FlxSpriteGroup
             forEach(function(spr)
             {
                 if(spr.alpha >= 1)
+                {
                     spr.alpha = 1;
+                    fadedIn = true;
+                }
                 else
                     spr.alpha += 0.1;
             });

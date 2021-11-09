@@ -84,6 +84,11 @@ class PresentationState extends FlxState
         add(titleBorder);
 
 
+		// Create timers
+		Timers = new ThunderStorm();
+		add(Timers);
+
+
 		// makeMusicPL();
 
 		// if (FlxG.sound.music == null)
@@ -163,7 +168,15 @@ class PresentationState extends FlxState
 		// else
 		// 	FlxG.sound.music.volume = 0.8;
 
-		// Alot of this is just copy and paste code, most of the panel creation and logic is handled in create()
+
+		if(Timers.CC)
+		{
+			CC_PANEL.fadeIn();
+			trace("FADING IN CC");
+			
+			if(CC_PANEL.fadedIn)
+				Timers.CC = false;
+		}
 
 		super.update(elapsed);
 	}

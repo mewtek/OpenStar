@@ -1,5 +1,6 @@
 package;
 
+import LocalForcast.LocalForecast;
 import APIHandler.CCVARS;
 import flixel.FlxCamera;
 import flixel.FlxG;
@@ -85,44 +86,14 @@ class PresentationState extends FlxState
 	private var LOCALVOCAL_INTRO:FlxSound; // CC Intro
 	private var music_playlist:Array<String>; // String array of every music file in assets/music/
 
-	// Maps
-	private var map:FlxSprite;
-
-	// LOT8 Slide bools
-	// uses https://twcclassics.com/information/intellistar-flavors.html as reference.
-	private var CURRENT_CONDITIONS:Bool;
-	private var REGIONAL_OBSERVATIONS:Bool;
-	private var REGIONAL_RADAR:Bool;
-	private var ALMANAC:Bool;
-	private var AIR_QUALITY:Bool;
-	// or
-	private var OUTDOOR_ACTIVITY:Bool;
-	private var DAYPART_FORECAST:Bool;
-	private var REGIONAL_FORECAST:Bool;
-	private var LF:Bool; // Local Forecast
-	private var EXTENDED_FORECAST:Bool;
-	// or
-	private var THE_WEEK_AHEAD:Bool;
-
-	// this is a stupid way of doing this lmao
-	private var LF_0:Bool;
-	private var LF_1:Bool;
-	private var LF_2:Bool;
-	private var LF_3:Bool;
-	private var LF_4:Bool;
-
-	private var finished:Bool;
-
-	private var PresentationTimers:FlxTimerManager;
-
 	private var LDL:LowerDisplayLine;
 
 	private var CC_PANEL:CurrentConditions;
 	private var TWA_PANEL:TheWeekAhead;
+	private var LF_PANEL:LocalForecast;
 
 	override public function create():Void
 	{
-		this.PresentationTimers = new FlxTimerManager();
 
 		FlxG.mouse.visible = false;
 		FlxG.autoPause = false; // Disable the program pausing when the window is out of focus
@@ -176,7 +147,7 @@ class PresentationState extends FlxState
 		// CREATE PANEL TITLES \\
 
 		// TITLE GEN TESTING
-		var CC_TEST_TITLE:Title = new Title('black', 'white');
+		var CC_TEST_TITLE:Title = new Title('good morning', "twckelby discord lol");
 		add(CC_TEST_TITLE);
 
 		// Title Textures
@@ -277,10 +248,13 @@ class PresentationState extends FlxState
 		// Panel logic
 
 		CC_PANEL = new CurrentConditions();
-		// add(CC_PANEL);
+		add(CC_PANEL);
 
 		TWA_PANEL = new TheWeekAhead();
-		add(TWA_PANEL);
+		// add(TWA_PANEL);
+
+		LF_PANEL = new LocalForecast();
+		// add(LF_PANEL);
 
 		// create barometric pressure trend graphic
 		switch (APIHandler._CCVARS.baroTrend)
@@ -444,9 +418,11 @@ class PresentationState extends FlxState
 			trace("Skipping local vocal initalization because it's false..");
 
 		LDL = new LowerDisplayLine(FlxColor.TRANSPARENT);
+		
 		openSubState(LDL);
 
 		// createPresentationTimers();
+
 	}
 
 	function makeMusicPL():Array<String>
@@ -467,53 +443,12 @@ class PresentationState extends FlxState
 
 		trace(music_playlist);
 		return music_playlist;
+
 	}
 
-	function createPresentationTimers():Void // Real units keep all of these within 2 Minutes (120 seconds), so everything should be at 7-second intervals.
+	function finish()
 	{
-		var timers:Array<FlxTimer> = [];
-		// TODO: Find some way to automate the creation of these timers, this is kinda rediculous.
-		// Using a for loop wont work for some reason
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-		new FlxTimer(PresentationTimers);
-
-
-		PresentationTimers.forEach(function(tmr:FlxTimer)
-		{
-			timers.push(tmr);
-		});
-
-
-		timers[0].start(0, timer -> CURRENT_CONDITIONS = true);
-		timers[1].start(timers[0].time + 7, timer -> REGIONAL_OBSERVATIONS = true);
-		timers[2].start(timers[1].time + 7, timer -> REGIONAL_RADAR = true);
-		timers[3].start(timers[2].time + 7, timer -> ALMANAC = true);
-		timers[4].start(timers[3].time + 7, timer -> AIR_QUALITY = true);
-		timers[5].start(timers[4].time + 7, timer -> OUTDOOR_ACTIVITY = true); // TODO: Handle this somehow in panel logic
-		timers[6].start(timers[5].time + 7, timer -> DAYPART_FORECAST = true);
-		timers[7].start(timers[6].time + 7, timer -> REGIONAL_FORECAST = true);
-		timers[8].start(timers[7].time + 7, timer -> LF = true);
-		timers[9].start(timers[8].time, timer -> LF_0 = true);
-		timers[10].start(timers[9].time + 7, timer -> LF_1 = true);
-		timers[11].start(timers[10].time + 7, timer -> LF_2 = true);
-		timers[12].start(timers[11].time + 7, timer -> LF_3 = true);
-		timers[13].start(timers[12].time + 7, timer -> LF_4 = true);
-		timers[14].start(timers[13].time + 7, timer -> THE_WEEK_AHEAD = true);
-		timers[15].start(timers[14].time + 7, timer -> finished = true);
+		// TODO
 	}
 
 	// Everything in this function will be called every frame
@@ -526,11 +461,7 @@ class PresentationState extends FlxState
 		// else
 		// 	FlxG.sound.music.volume = 0.8;
 
-		if (PresentationTimers.active)
-			PresentationTimers.update(elapsed);
-
 		// Alot of this is just copy and paste code, most of the panel creation and logic is handled in create()
-
 
 		super.update(elapsed);
 	}

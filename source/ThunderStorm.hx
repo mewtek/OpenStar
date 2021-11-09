@@ -10,6 +10,7 @@ class ThunderStorm extends FlxTimerManager
 {
 
     var timers:Array<FlxTimer>;
+    var manager:FlxTimerManager;
     
     // Booleans for presentation slides
     // Based off of https://twcclassics.com/information/intellistar-flavors.html
@@ -44,49 +45,49 @@ class ThunderStorm extends FlxTimerManager
 
     public function new() {
         super();
-        timers = _timers;
+        this.manager = new FlxTimerManager();
+        timers = manager._timers;
 
         var timeStarted:Int = Date.now().getMinutes();
+
 
         // Create timers
         // Note: Real IS1 Units keep this around 2 minutes, but nothing's stopping you from going
         // well over.
 
         // TODO: Add timers for Weather Alerts screen
-        new FlxTimer().start(0, tmr -> CC = true);
-        new FlxTimer().start(timers[0].time + 7, tmr -> RC = true);  
-        new FlxTimer().start(timers[1].time + 7, tmr -> RR = true);
-        new FlxTimer().start(timers[2].time + 7, tmr -> AL = true);
+        new FlxTimer(manager).start(0, tmr -> CC = true);
+        new FlxTimer(manager).start(timers[0].time + 7, tmr -> RC = true);  
+        new FlxTimer(manager).start(timers[1].time + 7, tmr -> RR = true);
+        new FlxTimer(manager).start(timers[2].time + 7, tmr -> AL = true);
         // Panel switch between Getaway Forecast & Almanac panels
         if ([8, 28].contains(timeStarted))
-            new FlxTimer().start(timers[3].time + 7, tmr -> GA = true);
+            new FlxTimer(manager).start(timers[3].time + 7, tmr -> GA = true);
         else 
-            new FlxTimer().start(timers[3].time + 7, tmr -> AL = true);
+            new FlxTimer(manager).start(timers[3].time + 7, tmr -> AL = true);
 
-        new FlxTimer().start(timers[4].time + 7, tmr -> OA = true);
-        new FlxTimer().start(timers[5].time + 7, tmr -> DP = true);
-        new FlxTimer().start(timers[6].time + 7, tmr -> RF = true);  
-        new FlxTimer().start(timers[7].time + 7, tmr -> LF = true);
+        new FlxTimer(manager).start(timers[4].time + 7, tmr -> OA = true);
+        new FlxTimer(manager).start(timers[5].time + 7, tmr -> DP = true);
+        new FlxTimer(manager).start(timers[6].time + 7, tmr -> RF = true);  
+        new FlxTimer(manager).start(timers[7].time + 7, tmr -> LF = true);
         
         // Panel switch between TWA and Extended 3-Day
         // TODO: Timers need be fixed to account for the LF panel's total time.
         if([18, 48].contains(timeStarted))
-            new FlxTimer().start(timers[8].time + 7, tmr -> EF = true);
+            new FlxTimer(manager).start(timers[8].time + 7, tmr -> EF = true);
         else
-            new FlxTimer().start(timers[8].time + 7, tmr -> TWA = true);
+            new FlxTimer(manager).start(timers[8].time + 7, tmr -> TWA = true);
 
-        new FlxTimer().start(timers[9].time + 7, tmr -> TF = true);
-        new FlxTimer().start(timers[10].time + 7, tmr -> FIN = true);
+        new FlxTimer(manager).start(timers[9].time + 7, tmr -> TF = true);
+        new FlxTimer(manager).start(timers[10].time + 7, tmr -> FIN = true);
 
+        trace(timers.length);
        
     }
 
-    public override function update(elapsed)
-    {
-
-        if(active)
-            update(elapsed);
-
-        super.update(elapsed);
+    public override function update(elapsed) {
+        
+        if(manager.active)
+            manager.update(elapsed);
     }
 }

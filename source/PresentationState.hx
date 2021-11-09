@@ -28,57 +28,6 @@ class PresentationState extends FlxState
 
 	// Generic Graphics
 	private var BG:FlxSprite;
-	private var baroArrow:FlxSprite; // Genuinely thought this was a hilarious name for no reason
-	private var aqArrow:FlxSprite;
-
-	// Panels
-	private var ccPanel:FlxSprite;
-	private var lfPanel:FlxSprite;
-	private var twaPanel:FlxSprite;
-	private var noaaPanel:FlxSprite;
-
-	// Panel Titles
-	private var ccTitle:FlxSprite; // Current Conditions
-	private var lfTitle:FlxSprite; // Local Forecast
-	private var rrTitle:FlxSprite; // Regional Radar
-	private var lrTitle:FlxSprite; // Local Radar
-	private var drTitle:FlxSprite; // Satellite Radar (radar satellite)
-	private var alTitle:FlxSprite; // Almanac
-	private var twaTitle:FlxSprite; // The Week Ahead
-
-	// Current condtitions panel
-	private var CCTXT:FlxTypedGroup<FlxText>;
-
-	private var ccIcon:FlxSprite;
-	private var rhLabel:FlxText = new FlxText(828, 285, 'HUMIDITY');
-	private var dpLabel:FlxText = new FlxText(668, 385, 450, 'DEW POINT');
-	private var baroLabel:FlxText = new FlxText(668, 485, 450, 'PRESSURE');
-	private var visLabel:FlxText = new FlxText(668, 585, 450, 'VISBILITY');
-	private var wndLabel:FlxText = new FlxText(668, 685, 450, 'WIND');
-	private var gustLabel:FlxText = new FlxText(668, 785, 450, 'GUSTS');
-
-	private var cc_cityName:FlxText;
-	private var condTxt:FlxText;
-	private var tmpTxt:FlxText;
-	private var rhTxt:FlxText;
-	private var dpTxt:FlxText;
-	private var baroTxt:FlxText;
-	private var visTxt:FlxText;
-	private var wndTxt:FlxText;
-	private var gustTxt:FlxText;
-
-	// 36-Hour forecast panel
-	private var DOWTXT:FlxTypedGroup<FlxText>;
-	private var NARRATIVES:FlxTypedGroup<FlxText>;
-	private var lf_cityName:FlxText;
-
-	// The Week Ahead panel
-	private var twaIcons:FlxTypedGroup<FlxSprite>;
-	private var twaHiTemps:FlxTypedGroup<FlxText>;
-	private var twaLoTemps:FlxTypedGroup<FlxText>;
-	private var twaPhrases:FlxTypedGroup<FlxText>;
-	private var twaDays:FlxTypedGroup<FlxText>;
-	private var twaWeekend:FlxTypedGroup<FlxSprite>;
 
 	// Sounds
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
@@ -88,9 +37,13 @@ class PresentationState extends FlxState
 
 	private var LDL:LowerDisplayLine;
 
+	// Panels
 	private var CC_PANEL:CurrentConditions;
 	private var TWA_PANEL:TheWeekAhead;
 	private var LF_PANEL:LocalForecast;
+
+
+	private var Timers:ThunderStorm;
 
 	override public function create():Void
 	{
@@ -106,12 +59,9 @@ class PresentationState extends FlxState
 		APIHandler.getLocalForecast();
 		APIHandler.getCC();
 
-		trace(FlxG.save.data.apiKey);
-		OS_DEBUG = FlxG.save.data.OS_DEBUG;
-
 		// CREATE BACKGROUND
 
-		if (OS_DEBUG)
+		if (FlxG.save.data.OS_DEBUG)
 		{
 			FlxG.debugger.drawDebug = true;
 			// vv Basically the WeatherSTAR 4000 BG gradient, a bit easier to see draw boxes with
@@ -134,118 +84,14 @@ class PresentationState extends FlxState
 		// 	FlxG.sound.music.persist = false;
 		// }
 
-		// create map
-		// map = new FlxSprite(0, 0);
-		// map.loadGraphic(FlxAssets.getBitmapData('assets/images/radar/map.png'));
-		// map.scale.x = 0.8;
-		// map.scale.y = 0.8;
-		// map.antialiasing = true;
-		// map.alpha = 0;
-		// map.screenCenter(XY);
-		// add(map);
-
 		// CREATE PANEL TITLES \\
 
 		// TITLE GEN TESTING
-		var CC_TEST_TITLE:Title = new Title('good morning', "twckelby discord lol");
+		var CC_TEST_TITLE:Title = new Title('current', 'conditions');
 		add(CC_TEST_TITLE);
 
-		// Title Textures
 
-		var ccTitleTex = Resources.graphic('titles', 'current_conditions');
-		var lfTitleTex = Resources.graphic('titles', 'local-forecast');
-		var rrTitleTex = Resources.graphic('titles', 'regional_radar');
-		var lrTitleTex = Resources.graphic('titles', 'local_radar');
-		var drTitleTex = Resources.graphic('titles', 'radar_satellite');
-		var alTitleTex = Resources.graphic('titles', 'almanac');
-		var twaTitleTex = Resources.graphic('titles', '7day_outlook');
-
-		ccTitle = new FlxSprite(-174, -58);
-		ccTitle.loadGraphic(ccTitleTex);
-		ccTitle.scale.x = 0.65;
-		ccTitle.scale.y = 0.65;
-		ccTitle.antialiasing = true;
-		ccTitle.alpha = 0;
-		add(ccTitle);
-
-		lfTitle = new FlxSprite(-174, -58);
-		lfTitle.loadGraphic(lfTitleTex);
-		lfTitle.scale.x = 0.65;
-		lfTitle.scale.y = 0.65;
-		lfTitle.antialiasing = true;
-		lfTitle.alpha = 0;
-		add(lfTitle);
-
-		rrTitle = new FlxSprite(-174, -58);
-		rrTitle.loadGraphic(rrTitleTex);
-		rrTitle.scale.x = 0.65;
-		rrTitle.scale.y = 0.65;
-		rrTitle.antialiasing = true;
-		rrTitle.alpha = 0;
-		add(rrTitle);
-
-		lrTitle = new FlxSprite(-174, -58);
-		lrTitle.loadGraphic(lrTitleTex);
-		lrTitle.scale.x = 0.65;
-		lrTitle.scale.y = 0.65;
-		lrTitle.antialiasing = true;
-		lrTitle.alpha = 0;
-		add(lrTitle);
-
-		drTitle = new FlxSprite(-174, -58);
-		drTitle.loadGraphic(drTitleTex);
-		drTitle.scale.x = 0.65;
-		drTitle.scale.y = 0.65;
-		drTitle.antialiasing = true;
-		drTitle.alpha = 0;
-		add(drTitle);
-
-		alTitle = new FlxSprite(-174, -58);
-		alTitle.loadGraphic(alTitleTex);
-		alTitle.scale.x = 0.65;
-		alTitle.scale.y = 0.65;
-		alTitle.antialiasing = true;
-		alTitle.alpha = 0;
-		add(alTitle);
-
-		twaTitle = new FlxSprite(-174, -58);
-		twaTitle.loadGraphic(twaTitleTex);
-		twaTitle.scale.x = 0.65;
-		twaTitle.scale.y = 0.65;
-		twaTitle.antialiasing = true;
-		twaTitle.alpha = 0;
-		add(twaTitle);
-
-		// CREATE PANELS \\
-
-		// Panel Textures
-		var ccPanelTex = Resources.graphic('Panels', 'Current-Conditions');
-		var lfPanelTex = Resources.graphic('Panels', 'Local-Forecast');
-		var twaPanelTex = Resources.graphic('Panels', 'The-Week-Ahead');
-		var noaaPanelTex = Resources.graphic('Panels', 'Weather-Bulletin');
-
-		ccPanel = new FlxSprite(0, 165);
-		ccPanel.loadGraphic(ccPanelTex);
-		ccPanel.screenCenter(X);
-		ccPanel.antialiasing = true;
-		ccPanel.alpha = 0;
-		add(ccPanel);
-
-		lfPanel = new FlxSprite(0, 165);
-		lfPanel.loadGraphic(lfPanelTex);
-		lfPanel.screenCenter(X);
-		lfPanel.antialiasing = true;
-		lfPanel.alpha = 0;
-		add(lfPanel);
-
-		twaPanel = new FlxSprite(0, 165);
-		twaPanel.loadGraphic(twaPanelTex);
-		twaPanel.screenCenter(X);
-		twaPanel.antialiasing = true;
-		twaPanel.alpha = 0;
-		add(twaPanel);
-
-		// Panel logic
+		// Add Panels
 
 		CC_PANEL = new CurrentConditions();
 		add(CC_PANEL);
@@ -256,147 +102,6 @@ class PresentationState extends FlxState
 		LF_PANEL = new LocalForecast();
 		// add(LF_PANEL);
 
-		// create barometric pressure trend graphic
-		switch (APIHandler._CCVARS.baroTrend)
-		{
-			case "Steady":
-				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'steady'));
-			case "Rising":
-				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
-			case "Rapidly Rising":
-				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
-			case "Falling":
-				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
-				baroArrow.angle = 180;
-			case "Rapidly Falling":
-				baroArrow = new FlxSprite().loadGraphic(Resources.graphic('generic', 'arrow'));
-				baroArrow.angle = 180;
-		}
-
-		baroArrow.scale.x = 0.25;
-		baroArrow.scale.y = 0.25;
-		baroArrow.updateHitbox();
-		baroArrow.antialiasing = true;
-		baroArrow.setPosition(1485, 500);
-		baroArrow.alpha = 0;
-		add(baroArrow);
-
-
-
-		// 7-Day Outlook
-		twaIcons = new FlxTypedGroup<FlxSprite>();
-		twaHiTemps = new FlxTypedGroup<FlxText>();
-		twaLoTemps = new FlxTypedGroup<FlxText>();
-		twaPhrases = new FlxTypedGroup<FlxText>();
-		twaDays = new FlxTypedGroup<FlxText>();
-		twaWeekend = new FlxTypedGroup<FlxSprite>();
-
-		for (i in 0...7)
-		{
-			// Icons
-			var icon:FlxSprite;
-			// if (FileSystem.exists(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i])))
-			// {
-			// 	icon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._SEVENDAYDATA.iconCodes[i]), false);
-			// }
-			// else
-			// {
-			// 	trace('FAILED TO FIND ICON CODE ${APIHandler._SEVENDAYDATA.iconCodes[i]}, DEFAULTING TO N/A ICON');
-			// 	icon = new FlxSprite().loadGraphic(Resources.icon('44'), false);
-			// }
-
-			// icon.antialiasing = true;
-			// icon.scale.x = 1.5;
-			// icon.scale.y = 1.5;
-			// icon.updateHitbox();
-			// icon.setPosition((twaIcons.members[i - 1] != null ? twaIcons.members[i - 1].x + 235 : 160), 330);
-			// icon.ID = i;
-			// twaIcons.add(icon);
-
-			// Hi/Lo Temperature Labels
-			var hiTemp:FlxText;
-			hiTemp = new FlxText((twaHiTemps.members[i - 1] != null ? twaHiTemps.members[i - 1].x + 235 : 155), 625, 200, APIHandler._SEVENDAYDATA.hiTemps[i]);
-			hiTemp.setFormat(Resources.font('interstate-bold'), 100, FlxColor.WHITE, CENTER);
-			hiTemp.antialiasing = true;
-			hiTemp.ID = i;
-			twaHiTemps.add(hiTemp);
-
-			var loTemp:FlxText;
-			loTemp = new FlxText((twaLoTemps.members[i - 1] != null ? twaLoTemps.members[i - 1].x + 235 : 155), 725, 200, APIHandler._SEVENDAYDATA.loTemps[i]);
-			loTemp.setFormat(Resources.font('interstate-bold'), 100, FlxColor.WHITE, CENTER);
-			loTemp.antialiasing = true;
-			loTemp.ID = i;
-			twaLoTemps.add(loTemp);
-
-			// Days + Weekend rectangle graphic
-			var DOW:FlxText;
-			DOW = new FlxText((twaDays.members[i - 1] != null ? twaDays.members[i - 1].x + 235 : 176), 280, 150, APIHandler._SEVENDAYDATA.dow[i]);
-			DOW.setFormat(Resources.font('interstate-light'), 50, (APIHandler._SEVENDAYDATA.isWeekend[i] ? FlxColor.fromString("0x102a70") : FlxColor.WHITE),
-				CENTER);
-			DOW.antialiasing = true;
-			DOW.ID = i;
-			twaDays.add(DOW);
-
-			var WEEKEND_RECT:FlxSprite;
-			WEEKEND_RECT = new FlxSprite((twaWeekend.members[i - 1] != null ? twaWeekend.members[i - 1].x + 235 : 145.5),
-				274).makeGraphic(218, 60, FlxColor.WHITE);
-			WEEKEND_RECT.antialiasing = true;
-			WEEKEND_RECT.visible = APIHandler._SEVENDAYDATA.isWeekend[i];
-			WEEKEND_RECT.alpha = 0.95;
-			WEEKEND_RECT.ID = i;
-			twaWeekend.add(WEEKEND_RECT);
-		}
-
-		for (i in 0...twaDays.members.length)
-		{
-			twaDays.members[i].alpha = 0;
-			twaWeekend.members[i].alpha = 0;
-			twaHiTemps.members[i].alpha = 0;
-			twaLoTemps.members[i].alpha = 0;
-			// twaIcons.members[i].alpha = 0;
-		}
-
-		add(twaIcons);
-		add(twaHiTemps);
-		add(twaLoTemps);
-		add(twaWeekend);
-		add(twaDays);
-
-		// 36-hour forecast
-		DOWTXT = new FlxTypedGroup<FlxText>();
-		NARRATIVES = new FlxTypedGroup<FlxText>();
-
-		lf_cityName = new FlxText(150, 176, 0, APIHandler._LOCATIONDATA.cityName.toUpperCase());
-		lf_cityName.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
-		lf_cityName.antialiasing = true;
-		lf_cityName.alpha = 0;
-
-		// tfw I was about to do this by making a shitload of FlxText variables
-		// https://github.com/AyeTSG/Funkin_SmallThings/blob/master/source/OptionsMenu.hx
-		for (i in 0...APIHandler._FORECASTDATA.daypart_name.length)
-		{
-			var txt = new FlxText(150, 275, 700, APIHandler._FORECASTDATA.daypart_name[i]);
-			txt.setFormat(Resources.font('interstate-regular'), 70, FlxColor.YELLOW, LEFT);
-			txt.alpha = 0;
-			txt.antialiasing = true;
-			txt.ID = i;
-			DOWTXT.add(txt);
-		}
-
-		for (i in 0...APIHandler._FORECASTDATA.narrative.length)
-		{
-			var txt = new FlxText(150, 350, 1620, APIHandler._FORECASTDATA.narrative[i]);
-			txt.setFormat(Resources.font('interstate-bold'), 65, FlxColor.WHITE, LEFT);
-			txt.alpha = 0;
-			txt.antialiasing = true;
-			txt.ID = i;
-			NARRATIVES.add(txt);
-		}
-
-		add(lf_cityName);
-		add(DOWTXT);
-		add(NARRATIVES);
-
 		// Narrations
 
 		if (FlxG.save.data.localVocal)
@@ -406,23 +111,12 @@ class PresentationState extends FlxState
 				() -> LOCALVOCAL_CC.play());
 			LOCALVOCAL_CC = FlxG.sound.load(Resources.narration('${APIHandler._CCVARS.ccIconCode}', "conditions"));
 
-			/*
-				I genuinely don't know why, but for some god-forsaken reason,
-				using the StartTime variable in the play() function for FlxG doesn't actually
-				do anything besides completely ignoring the onComplete() function that's done when
-				these are all loaded into the state.
-			 */
 			new FlxTimer().start(0.2, timer -> LOCALVOCAL_INTRO.play());
 		}
-		else
-			trace("Skipping local vocal initalization because it's false..");
+
 
 		LDL = new LowerDisplayLine(FlxColor.TRANSPARENT);
-		
 		openSubState(LDL);
-
-		// createPresentationTimers();
-
 	}
 
 	function makeMusicPL():Array<String>

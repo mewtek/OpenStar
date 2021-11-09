@@ -12,7 +12,6 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 class Title extends FlxSpriteGroup
 {
 
-    var TITLE_BORDER:FlxSprite;
     var GRADIENT_BLACK:FlxSprite;
     var GRADIENT_WHITE:FlxSprite;
 
@@ -25,18 +24,12 @@ class Title extends FlxSpriteGroup
     {
         super();
 
-        TITLE_BORDER = new FlxSprite().loadGraphic('assets/images/titles/title-parts/TITLE_BORDER.png');
         GRADIENT_BLACK = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_BLACK'));
         GRADIENT_WHITE = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_WHITE'));
 
 
         // Set sizes and positions
-        
-        TITLE_BORDER.scale.set(0.65, 0.65);
-        TITLE_BORDER.updateHitbox();
-        TITLE_BORDER.setPosition(140, -18);       
-        add(TITLE_BORDER);
-
+    
         GRADIENT_BLACK.scale.set(0.65, 0.65);
         GRADIENT_BLACK.setPosition(-10, -58);
         // add(GRADIENT_BLACK);

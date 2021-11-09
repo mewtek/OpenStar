@@ -28,6 +28,7 @@ class PresentationState extends FlxState
 
 	// Generic Graphics
 	private var BG:FlxSprite;
+	private var titleBorder:FlxSprite;
 
 	// Sounds
 	private var LOCALVOCAL_CC:FlxSound; // Current Condition narration
@@ -59,7 +60,7 @@ class PresentationState extends FlxState
 		APIHandler.getLocalForecast();
 		APIHandler.getCC();
 
-		// CREATE BACKGROUND
+		// Create generic graphics
 
 		if (FlxG.save.data.OS_DEBUG)
 		{
@@ -75,6 +76,13 @@ class PresentationState extends FlxState
 			BG.antialiasing = false;
 			add(BG);
 		}
+
+		titleBorder = new FlxSprite().loadGraphic('assets/images/titles/title-parts/TITLE_BORDER.png');
+		titleBorder.scale.set(0.65, 0.65);
+        titleBorder.updateHitbox();
+        titleBorder.setPosition(140, -18);       
+        add(titleBorder);
+
 
 		// makeMusicPL();
 

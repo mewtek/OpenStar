@@ -79,6 +79,10 @@ class InitializationState extends FlxState
 		if (FlxG.keys.pressed.D)
 			FlxG.switchState(new DebugMenu());
 
+		// Debug: let us get thrown into the state regardless of what the timer is
+		if (FlxG.keys.pressed.F)
+			FlxG.switchState(new PresentationState());
+
 		super.update(elapsed);
 	}
 }

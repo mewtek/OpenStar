@@ -28,7 +28,7 @@ typedef LOCATIONDATA =
 
 typedef CCVARS =
 {
-	var ccIconCode:String;
+	var ccIconCode:Int;
 	var currentCondition:String;
 	var windSpd:String; // Put as a string due to the getCC function returning the wind direction
 	var temperature:Int;
@@ -36,6 +36,7 @@ typedef CCVARS =
 	var relHumidity:Int;
 	var baroPressure:Float;
 	var baroTrend:String;
+	var visibility:Float;
 }
 
 typedef FORECASTDATA =
@@ -46,7 +47,7 @@ typedef FORECASTDATA =
 
 typedef SEVENDAYDATA =
 {
-	var iconCodes:Array<String>;
+	var iconCodes:Array<Int>;
 	var hiTemps:Array<String>;
 	var loTemps:Array<String>;
 	var dow:Array<String>;
@@ -135,7 +136,8 @@ class APIHandler
 				dewpoint: res.temperatureDewPoint,
 				relHumidity: res.relativeHumidity,
 				baroPressure: res.pressureAltimeter,
-				baroTrend: res.pressureTendencyTrend
+				baroTrend: res.pressureTendencyTrend,
+				visibility: res.visibility
 			};
 		}
 
@@ -160,7 +162,7 @@ class APIHandler
 		var narratives:Array<String> = [];
 
 		// For 7-day outlook
-		var ICONS:Array<String> = [];
+		var ICONS:Array<Int> = [];
 		var HI:Array<String> = [];
 		var LO:Array<String> = [];
 		var DOW:Array<String> = [];
@@ -177,7 +179,10 @@ class APIHandler
 				{
 					names.push(res.daypart[0].daypartName[i]);
 					narratives.push(res.daypart[0].narrative[i]);
+					
+					#if debug
 					trace(res.daypart[0].daypartName[i] + ": " + res.daypart[0].narrative[i]);
+					#end
 
 					if (res.daypart[0].narrative[i] == null)
 						narratives.push("Forecast not available.");
@@ -192,7 +197,7 @@ class APIHandler
 			// 7-Day outlook!
 			for (i in 0...res.dayOfWeek.length)
 			{
-				ICONS.push('44'); // TODO: Figure out icons
+				ICONS.push(44); // TODO: Figure out icons
 
 				if (res.calendarDayTemperatureMax[i] != null)
 					HI.push('${res.calendarDayTemperatureMax[i]}');

@@ -12,52 +12,58 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 class Title extends FlxSpriteGroup
 {
 
-    var TITLE_BORDER:FlxSprite;
     var GRADIENT_BLACK:FlxSprite;
     var GRADIENT_WHITE:FlxSprite;
 
     // Text
     var blackTxt:FlxText;
+    var blackTxt_shadow:FlxText;
     var whiteTxt:FlxText;
 
-    public function new(text_black:String, text_white:String, ?isRadarTitle:Bool = false)
+    public function new(text_black:String, ?text_white:String, ?isRadarTitle:Bool = false)
     {
         super();
 
-        TITLE_BORDER = new FlxSprite().loadGraphic('assets/images/titles/title-parts/TITLE_BORDER.png');
         GRADIENT_BLACK = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_BLACK'));
         GRADIENT_WHITE = new FlxSprite().loadGraphic(Resources.graphic('titles', 'title-parts/TITLE_WHITE'));
 
+
         // Set sizes and positions
-        
+    
         GRADIENT_BLACK.scale.set(0.65, 0.65);
-        GRADIENT_BLACK.setPosition(50, -58);
+        GRADIENT_BLACK.setPosition(-10, -58);
         // add(GRADIENT_BLACK);
 
-        GRADIENT_WHITE.scale.set(0.65, 0.65);
-        GRADIENT_WHITE.setPosition(265, -55);
-        // add(GRADIENT_WHITE);
-
-        TITLE_BORDER.scale.set(0.65, 0.65);
-        TITLE_BORDER.setPosition(-174, -58);       
-        add(TITLE_BORDER);
+        if (text_white != null)
+        {
+            GRADIENT_WHITE.scale.set(0.65, 0.65);
+            GRADIENT_WHITE.setPosition(0, -62);
+            add(GRADIENT_WHITE);
+        }
 
 
         // create text
-        blackTxt = new FlxText(150, 55);
+        blackTxt_shadow = new FlxText(152, 53.2);
+        blackTxt_shadow.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
+        blackTxt_shadow.text = text_black;
+        add(blackTxt_shadow);
+
+
+        blackTxt = new FlxText(150, 50);
         blackTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.WHITE, LEFT);
-        blackTxt.text = "current";
+        blackTxt.text = text_black;
         add(blackTxt);
 
-        whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 55);
-        whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
-        whiteTxt.text = "conditions";
-        add(whiteTxt); 
+        if(text_white != null)
+        {
+            whiteTxt = new FlxText((blackTxt.fieldWidth + 178 ), 50);
+            whiteTxt.setFormat(Resources.font('interstate-bold'), 85, FlxColor.BLACK, LEFT);
+            whiteTxt.text = text_white;
+            GRADIENT_WHITE.x = whiteTxt.x - 218;
+            add(whiteTxt); 
+        }
 
-
-        // GRADIENT_BLACK.width = Std.int(blackTxt.fieldWidth);
-        // GRADIENT_BLACK.x = blackTxt.fieldWidth - 305;
-
+    
         forEach(sprite -> sprite.antialiasing = true);
     }
 }

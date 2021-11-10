@@ -56,7 +56,7 @@ class ThunderStorm extends FlxTimerManager
         // well over.
 
         // TODO: Add timers for Weather Alerts screen
-        new FlxTimer(manager).start(0, tmr -> CC = true);
+        new FlxTimer(manager).start(0.5, tmr -> CC = true);
         new FlxTimer(manager).start(timers[0].time + 7, tmr -> RC = true);  
         new FlxTimer(manager).start(timers[1].time + 7, tmr -> RR = true);
         new FlxTimer(manager).start(timers[2].time + 7, tmr -> AL = true);
@@ -89,5 +89,6 @@ class ThunderStorm extends FlxTimerManager
         
         if(manager.active)
             manager.update(elapsed);
+
     }
 }

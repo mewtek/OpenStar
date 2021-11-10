@@ -97,13 +97,6 @@ class PresentationState extends FlxState
 		// 	FlxG.sound.music.persist = false;
 		// }
 
-		// CREATE PANEL TITLES \\
-
-		// TITLE GEN TESTING
-		var CC_TEST_TITLE:Title = new Title('current', 'conditions');
-		add(CC_TEST_TITLE);
-
-
 		// Add Panels
 
 		CC_PANEL = new CurrentConditions();
@@ -176,6 +169,14 @@ class PresentationState extends FlxState
 			
 			if(CC_PANEL.fadedIn)
 				Timers.CC = false;
+		}
+
+		if(Timers.RC)
+		{
+			CC_PANEL.fadeOut();
+
+			if(CC_PANEL.fadedOut)
+				Timers.RC = false;
 		}
 
 		super.update(elapsed);

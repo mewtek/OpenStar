@@ -10,6 +10,7 @@ class CurrentConditions extends FlxSpriteGroup
 {
     var panel:FlxSprite;
     var tex:String = Resources.graphic('Panels', 'Current-Conditions');
+    var title:Title;
 
     // GFX
     var icon:FlxSprite;
@@ -47,6 +48,10 @@ class CurrentConditions extends FlxSpriteGroup
         panel = new FlxSprite(0, 165).loadGraphic(tex);
         panel.screenCenter(X);
         add(panel);
+
+        title = new Title('current', 'conditions');
+        add(title);
+
 
         icon = new FlxSprite().loadGraphic(Resources.icon(APIHandler._CCVARS.ccIconCode));
         icon.scale.set(1.7, 1.7);

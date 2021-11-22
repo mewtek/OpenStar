@@ -1,6 +1,10 @@
 package;
 
-import LocalForcast.LocalForecast;
+import panels.CurrentConditions.CurrentConditions;
+import panels.LocalForcast.LocalForecast;
+import panels.TheWeekAhead.TheWeekAhead;
+import panels.AirQuality.AirQuality;
+import panels.Almanac.Almanac;
 import APIHandler.CCVARS;
 import flixel.FlxCamera;
 import flixel.FlxG;

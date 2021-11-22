@@ -1,4 +1,4 @@
-package;
+package panels;
 
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
@@ -10,12 +10,17 @@ class LocalForecast extends FlxSpriteGroup
 {   
     var panel:FlxSprite;
     var tex:String = Resources.graphic('Panels', 'Local-Forecast');
+    public var fadedIn:Bool;
+    public var fadedOut:Bool;
 
     // Text
     var daypartName:FlxTypedGroup<FlxText>;
     var forecastTxt:FlxTypedGroup<FlxText>;
     var city:FlxText;
 
+
+    // Switching variables
+    
 
     public function new()
     {
@@ -57,6 +62,30 @@ class LocalForecast extends FlxSpriteGroup
             add(forecastTxt.members[i]);
         }
 
-        forEach(sprite -> sprite.antialiasing = true);
+        forEach(sprite -> {sprite.antialiasing = true; sprite.alpha = 0;});
+    }
+
+    public override function update(e)
+    {
+        
+
+
+
+        super.update(e);
+    }
+    
+    function makeTimers()
+    {
+    }
+
+
+    public inline function fadeIn()
+    {
+
+    }
+
+    public inline function fadeOut()
+    {
+
     }
 }

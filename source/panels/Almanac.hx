@@ -1,14 +1,14 @@
-package;
+package panels;
 
 import flixel.FlxSprite;
 import flixel.group.FlxSpriteGroup;
 
-class AirQuality extends FlxSpriteGroup
+class Almanac extends FlxSpriteGroup
 {
 
   // Generic Panel GFX
   var panel:FlxSprite;
-  var tex:String = Resources.graphic('Panels', 'panelName');
+  var tex:String = Resources.graphic('Panels', 'Almanac');
   public var fadedIn:Bool;
   public var fadedOut:Bool;
 

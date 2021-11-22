@@ -1,4 +1,4 @@
-package;
+package panels;
 
 import flixel.util.FlxColor;
 import flixel.ui.FlxButton.FlxTypedButton;

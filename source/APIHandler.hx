@@ -54,6 +54,18 @@ typedef SEVENDAYDATA =
 	var isWeekend:Array<Bool>;
 }
 
+
+typedef ALMANAC = 
+{
+	// TODO: Add data types
+}
+
+typedef AQDATA =
+{
+	var index:Int;
+	var category:String;
+}
+
 // Handles calls to IBM's JSON API.
 class APIHandler
 {
@@ -269,9 +281,22 @@ class APIHandler
 	// [API LINK]
 	public static function getRegionalCC():Void {}
 
+
+	public static function getAlmanac():Void
+	{
+		// TODO
+	}
+	
+
+	public static function getAirQuality():Void 
+	{
+		// TOOD
+
+	}
+
 	// Pulls from MapBox to get the base map for Radar and whatnot.
 	// downloads as a 2560x1440 image instead of 1280x720.
-	// TODO: Rebuild the asset library for assets/images after this function is ran!!
+	// ! TODO: Rebuild the asset library for assets/images after this function is ran!!
 	public static function getMap():Void
 	{
 		trace("DOWNLOADING MAP DATA");

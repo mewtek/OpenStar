@@ -110,7 +110,7 @@ class PresentationState extends FlxState
 		// add(TWA_PANEL);
 
 		LF_PANEL = new LocalForecast();
-		// add(LF_PANEL);
+		add(LF_PANEL);
 
 		// Narrations
 
@@ -165,23 +165,28 @@ class PresentationState extends FlxState
 		// else
 		// 	FlxG.sound.music.volume = 0.8;
 
-
-		if(Timers.CC)
+		if(!LF_PANEL.fadedIn)
 		{
-			CC_PANEL.fadeIn();
-			trace("FADING IN CC");
+			LF_PANEL.fadeIn();
+		}
+
+
+		// if(Timers.CC)
+		// {
+		// 	CC_PANEL.fadeIn();
+		// 	trace("FADING IN CC");
 			
-			if(CC_PANEL.fadedIn)
-				Timers.CC = false;
-		}
+		// 	if(CC_PANEL.fadedIn)
+		// 		Timers.CC = false;
+		// }
 
-		if(Timers.RC)
-		{
-			CC_PANEL.fadeOut();
+		// if(Timers.RC)
+		// {
+		// 	CC_PANEL.fadeOut();
 
-			if(CC_PANEL.fadedOut)
-				Timers.RC = false;
-		}
+		// 	if(CC_PANEL.fadedOut)
+		// 		Timers.RC = false;
+		// }
 
 		super.update(elapsed);
 	}

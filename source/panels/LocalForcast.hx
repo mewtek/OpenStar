@@ -1,5 +1,6 @@
 package panels;
 
+import flixel.util.FlxTimer;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
@@ -10,17 +11,16 @@ class LocalForecast extends FlxSpriteGroup
 {   
     var panel:FlxSprite;
     var tex:String = Resources.graphic('Panels', 'Local-Forecast');
-    public var fadedIn:Bool;
-    public var fadedOut:Bool;
+    var title:Title;
+    public var fadedIn:Bool = false;
+    public var fadedOut:Bool = false;
 
     // Text
     var daypartName:FlxTypedGroup<FlxText>;
     var forecastTxt:FlxTypedGroup<FlxText>;
     var city:FlxText;
 
-
-    // Switching variables
-    
+    var LFTimers:ForecastTimers;
 
     public function new()
     {
@@ -29,6 +29,9 @@ class LocalForecast extends FlxSpriteGroup
         panel = new FlxSprite(0, 165).loadGraphic(tex);
         panel.screenCenter(X);
         add(panel);
+
+        title = new Title('local', 'forecast');
+        add(title);
 
 
         // Set up groups
@@ -56,6 +59,8 @@ class LocalForecast extends FlxSpriteGroup
         city.setFormat(Resources.font('interstate-bold'), 70, FlxColor.YELLOW);
         add(city);
 
+        // ? For some reason FlxSpriteGroups make you add all of this one-by-one.
+        // ? It's bloody annoying.
         for (i in 0...daypartName.members.length)
         {
             add(daypartName.members[i]);
@@ -67,25 +72,168 @@ class LocalForecast extends FlxSpriteGroup
 
     public override function update(e)
     {
+
+        if(LFTimers != null)
+        {
+
+            if(LFTimers.LF0)
+                {
+                    if(daypartName.members[0].alpha < 1)
+                    {
+                        daypartName.members[0].alpha += 0.2;
+                        forecastTxt.members[0].alpha += 0.2;
+                    } else if (daypartName.members[0].alpha >= 1)
+                    {
+                        daypartName.members[0].alpha = 1;
+                        forecastTxt.members[0].alpha = 1;
+                        LFTimers.LF0 = false;
+                    }
+                }
         
+                if(LFTimers.LF1)
+                {
+        
+                    // Fade out the last set of text + daypart names
+                    if(daypartName.members[0].alpha != 0)
+                        {
+                            daypartName.members[0].alpha -= 0.2;
+                            forecastTxt.members[0].alpha -= 0.2;
+                        } else 
+                        {
+                            daypartName.members[0].alpha = 0;
+                            forecastTxt.members[0].alpha = 0;
+                        }
+        
+                        if(daypartName.members[1].alpha < 1)
+                        {
+                            daypartName.members[1].alpha += 0.2;
+                            forecastTxt.members[1].alpha += 0.2;
+                        } else if (daypartName.members[1].alpha >= 1)
+                        {
+                            daypartName.members[1].alpha = 1;
+                            forecastTxt.members[1].alpha = 1;
+                            LFTimers.LF1 = false;
+                        }
+                }
+        
+        
+                if(LFTimers.LF2)
+                    {
+            
+                        // Fade out the last set of text + daypart names
+                        if(daypartName.members[1].alpha != 0)
+                            {
+                                daypartName.members[1].alpha -= 0.2;
+                                forecastTxt.members[1].alpha -= 0.2;
+                            } else 
+                            {
+                                daypartName.members[1].alpha = 0;
+                                forecastTxt.members[1].alpha = 0;
+                            }
+            
+                            if(daypartName.members[2].alpha < 1)
+                            {
+                                daypartName.members[2].alpha += 0.2;
+                                forecastTxt.members[2].alpha += 0.2;
+                            } else if (daypartName.members[2].alpha >= 1)
+                            {
+                                daypartName.members[2].alpha = 1;
+                                forecastTxt.members[2].alpha = 1;
+                                LFTimers.LF2 = false;
+                            }
+                    }
+            
+        
+                    if(LFTimers.LF3)
+                        {
+                
+                            // Fade out the last set of text + daypart names
+                            if(daypartName.members[2].alpha != 0)
+                                {
+                                    daypartName.members[2].alpha -= 0.2;
+                                    forecastTxt.members[2].alpha -= 0.2;
+                                } else 
+                                {
+                                    daypartName.members[2].alpha = 0;
+                                    forecastTxt.members[2].alpha = 0;
+                                }
+                
+                                if(daypartName.members[3].alpha < 1)
+                                {
+                                    daypartName.members[3].alpha += 0.2;
+                                    forecastTxt.members[3].alpha += 0.2;
+                                } else if (daypartName.members[3].alpha >= 1)
+                                {
+                                    daypartName.members[3].alpha = 1;
+                                    forecastTxt.members[3].alpha = 1;
+                                    LFTimers.LF3 = false;
+                                }
+                        }
 
-
+        }
+       
 
         super.update(e);
     }
     
-    function makeTimers()
-    {
-    }
-
-
     public inline function fadeIn()
     {
-
+        if (panel.alpha < 1)
+        {
+            panel.alpha += 0.1;
+            title.alpha += 0.1;
+        } else if(panel.alpha >= 1)
+        {
+            panel.alpha = 1;
+            title.alpha = 1;
+            fadedIn = true;
+            LFTimers = new ForecastTimers();
+        }
     }
 
     public inline function fadeOut()
     {
 
+    }
+}
+
+class ForecastTimers extends FlxTimerManager
+{
+    var timers:Array<FlxTimer>;
+    var manager:FlxTimerManager;
+
+    public var LF0:Bool = false; // Today/Tonight
+    public var LF1:Bool = false; // Tomorrow
+    public var LF2:Bool = false; // Tomorrow Night
+    public var LF3:Bool = false; // 3rd day
+
+    public var timersMade:Bool = false;
+
+    public function new()
+    {
+        super();
+
+        this.manager = new FlxTimerManager();
+        timers = manager._timers;
+
+        if(!timersMade)
+        {
+            new FlxTimer(manager).start(0.5, tmr -> LF0 = true);
+            new FlxTimer(manager).start(timers[0].time + 5, tmr -> LF1 = true);
+            new FlxTimer(manager).start(timers[1].time + 5, tmr -> LF2 = true);
+            new FlxTimer(manager).start(timers[2].time + 5, tmr -> LF3 = true);
+            timersMade = true;
+            trace("LF Panel timers created!");
+        }
+        else
+            trace("TIMERS ALREADY MADE!");
+    }
+
+    public override function update(e) {
+        if(manager.active)
+        {
+            manager.update(e);
+            trace("Updating timer..");
+        }
     }
 }

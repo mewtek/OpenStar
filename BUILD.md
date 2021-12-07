@@ -18,7 +18,7 @@ These will install 4 GB worth of tools. After this is finished, [download & inst
 
 ## Set up compilers on macOS
 The software needed for compiling on macOS is included Apple's Xcode software. Download the latest verison of Xcode from [Apple's website.](https://developer.apple.com/xcode/) 
-> Note, Xcode is kind of big, Go like, grab a coffee or take a shower or something, this will take a while.
+> Note: Xcode is kind of big. Go like, grab a coffee or take a shower or something, this will take a while.
 
 After Xcode is installed, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#set-up-haxeflixel--openfl)**
 

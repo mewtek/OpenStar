@@ -26,8 +26,11 @@ After Xcode is installed, [download & install Haxe](https://haxe.org/download/),
 The software for building on Linux distros (debian, arch, etc.) should be pre-installed with your system. If not, install GCC and G++ using the following commands:
 
 Debian: ``sudo apt install build-essential `` (Installs GCC, G++, and make.)
+
 Arch: ``sudo pacman -Syu gcc``
+
 centOS: ``sudo yum install gcc-c++``
+
 Fedora: ``sudo dnf groupinstall 'Development Tools'``
 
 > NOTE: You may also need to install ``g++-multilib`` and ``gcc-multilib``

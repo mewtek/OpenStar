@@ -1,6 +1,6 @@
 <p align="center">
-		<img width=750 src="https://i.imgur.com/uShXA4a.png">
-	An ItelliStar Simulator.
+	<img width=750 src="https://i.imgur.com/uShXA4a.png"></img>
+	
 </p>
 
 ## What is this?

@@ -14,13 +14,13 @@ When installing it, *don't click on the options to install workloads.* Instead, 
  - MSVC v142 - VS 2019 C++ x64/x86 build tools
  - Windows SDK (10.0.17763.0)
 
-These will install 4 GB worth of tools. After this is finished, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#Set-up-HaxeFlixel-&-OpenFl)**
+These will install 4 GB worth of tools. After this is finished, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#set-up-haxeflixel--openfl)**
 
 ## Set up compilers on macOS
 The software needed for compiling on macOS is included Apple's Xcode software. Download the latest verison of Xcode from [Apple's website.](https://developer.apple.com/xcode/) 
 > Note, Xcode is kind of big, Go like, grab a coffee or take a shower or something, this will take a while.
 
-After Xcode is installed, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#Set-up-HaxeFlixel-&-OpenFl)**
+After Xcode is installed, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#set-up-haxeflixel--openfl)**
 
 ## Set up compilers on Linux
 The software for building on Linux distros (debian, arch, etc.) should be pre-installed with your system. If not, install GCC and G++ using the following commands:
@@ -32,7 +32,7 @@ Fedora: ``sudo dnf groupinstall 'Development Tools'``
 
 > NOTE: You may also need to install ``g++-multilib`` and ``gcc-multilib``
 
-After you've confirmed that GCC is installed on your system, [install Haxe](https://haxe.org/download/linux/), then continue to **[Set up HaxeFlixel & OpenFl](#Set-up-HaxeFlixel-&-OpenFl)**
+After you've confirmed that GCC is installed on your system, [install Haxe](https://haxe.org/download/linux/), then continue to **[Set up HaxeFlixel & OpenFl](#set-up-haxeflixel--openfl)**
 
 
 # Set up HaxeFlixel & OpenFl

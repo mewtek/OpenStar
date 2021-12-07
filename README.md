@@ -1,8 +1,7 @@
 <p align="center">
 		<img width=750 src="https://i.imgur.com/uShXA4a.png">
+	An ItelliStar Simulator.
 </p>
-
-<center> An IntelliStar Simulator. </center>
 
 ## What is this?
 OpenStar is software written in Haxe using the [HaxeFlixel](https://haxeflixel.com) and [OpenFl](https://www.openfl.org) libraries. 
@@ -24,10 +23,10 @@ Also note that when building this software, **you can only build for the current
 Building HTML5 versions requires heavy source code modification and some rewrites to functions that may not work with it. While I don't plan on adding official HTML5 support for OpenStar anytime soon, I will gladly accept pull requests that attempt to add it for the sake of letting it run on older systems that at least have enough power to render HTML5-based applications.
 
 ## Credits
-[tomtwentytoo](https://twitter.com/tomtwentytoo) - Made the graphic recreations for OpenStar
-[wxTV](https://twitter.com/luesjo12)	- Help regarding APIs used
-[mewtek](https://github.com/mewtek) - Main programming
-[IBM](https://www.ibm.com/weather)	- API Data
+-[tomtwentytoo](https://twitter.com/tomtwentytoo) - Made the graphic recreations for OpenStar
+-[wxTV](https://twitter.com/luesjo12)	- Help regarding APIs used
+-[mewtek](https://github.com/mewtek) - Main programming
+-[IBM](https://www.ibm.com/weather)	- API Data
 
 ## Attributions and Disclaimers
 

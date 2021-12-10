@@ -1,7 +1,8 @@
 package;
 
+import panels.LocalForecast.ForecastTimers;
 import panels.CurrentConditions.CurrentConditions;
-import panels.LocalForcast.LocalForecast;
+import panels.LocalForecast.LocalForecast;
 import panels.TheWeekAhead.TheWeekAhead;
 import panels.AirQuality.AirQuality;
 import panels.Almanac.Almanac;
@@ -24,7 +25,6 @@ import sys.FileSystem;
 import sys.io.File;
 
 using StringTools;
-
 class PresentationState extends FlxState
 {
 	private var OS_DEBUG:Bool;
@@ -46,6 +46,10 @@ class PresentationState extends FlxState
 	private var CC_PANEL:CurrentConditions;
 	private var TWA_PANEL:TheWeekAhead;
 	private var LF_PANEL:LocalForecast;
+
+	
+	// Local forecast timers
+	private var LF_TIMERS:ForecastTimers;
 
 
 	private var Timers:ThunderStorm;
@@ -92,6 +96,9 @@ class PresentationState extends FlxState
 		Timers = new ThunderStorm();
 		add(Timers);
 
+		LF_TIMERS = new ForecastTimers();	// Timers for the local forecast panel - needs to be set active when the panel appears.
+		add(LF_TIMERS);
+
 
 		// makeMusicPL();
 
@@ -113,7 +120,8 @@ class PresentationState extends FlxState
 		add(LF_PANEL);
 
 		// Narrations
-
+		// Currently only suppots the Current Conditions panel, as that's all thats currently available
+		// for IS1 narration files. Thanks IBM!
 		if (FlxG.save.data.localVocal)
 		{
 			LOCALVOCAL_INTRO = FlxG.sound.load(Resources.narration("CC_INTRO1", null), 1.0, false, null, false, false, null, () -> LOCALVOCAL_TMP.play());
@@ -154,7 +162,7 @@ class PresentationState extends FlxState
 	{
 		// TODO
 	}
-
+	
 	// Everything in this function will be called every frame
 	// Remember to destroy your timers!
 	override public function update(elapsed):Void
@@ -168,6 +176,12 @@ class PresentationState extends FlxState
 		if(!LF_PANEL.fadedIn)
 		{
 			LF_PANEL.fadeIn();
+		} else 
+		{
+			if(!LF_TIMERS.timersActive)
+				LF_TIMERS.makeActive();
+
+			LF_PANEL.updateLF(LF_TIMERS);
 		}
 
 

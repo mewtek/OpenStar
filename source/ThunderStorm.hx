@@ -74,9 +74,9 @@ class ThunderStorm extends FlxTimerManager
         // Panel switch between TWA and Extended 3-Day
         // TODO: Timers need be fixed to account for the LF panel's total time.
         if([18, 48].contains(timeStarted))
-            new FlxTimer(manager).start(timers[8].time + 7, tmr -> EF = true);
+            new FlxTimer(manager).start(timers[8].time + 24.4, tmr -> EF = true);
         else
-            new FlxTimer(manager).start(timers[8].time + 7, tmr -> TWA = true);
+            new FlxTimer(manager).start(timers[8].time + 24.4, tmr -> TWA = true);
 
         new FlxTimer(manager).start(timers[9].time + 7, tmr -> TF = true);
         new FlxTimer(manager).start(timers[10].time + 7, tmr -> FIN = true);

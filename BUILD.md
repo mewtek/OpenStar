@@ -4,7 +4,7 @@
 ### This is for *building* OpenStar. If you're looking to just run the software, you should download the [latest release](https://github.com/mewtek/OpenStar/releases) instead
 
 ### Important Note:
-In order to build for one operating system, **you need to be on that operating system.** So, to build on Windows, you need to be on Windows, same with Linux, and same with macOS. If you don't want to multi-boot, you can probably build for different operating systems using a virtual machine, but I can't personally garuntee the compile time will be too great.
+In order to build for one operating system, **you need to be on that operating system.** So, to build on Windows, you need to be on Windows, same with Linux, and same with macOS. If you don't want to multi-boot, you can probably build for different operating systems using a virtual machine, but I can't personally guarantee the compile time will be too great.
 
 ## Set up compilers on Windows
 Setting up compilers on Windows is a bit more complicated than other operating systems. In order to download the compilers, you also need to download [Visual Studio](https://visualstudio.microsoft.com/downloads/). 
@@ -18,7 +18,7 @@ These will install 4 GB worth of tools. After this is finished, [download & inst
 
 ## Set up compilers on macOS
 The software needed for compiling on macOS is included Apple's Xcode software. Download the latest verison of Xcode from [Apple's website.](https://developer.apple.com/xcode/) 
-> Note, Xcode is kind of big, Go like, grab a coffee or take a shower or something, this will take a while.
+> Note: Xcode is kind of big. Go like, grab a coffee or take a shower or something, this will take a while.
 
 After Xcode is installed, [download & install Haxe](https://haxe.org/download/), then continue to **[Set up HaxeFlixel & OpenFl](#set-up-haxeflixel--openfl)**
 
@@ -26,8 +26,11 @@ After Xcode is installed, [download & install Haxe](https://haxe.org/download/),
 The software for building on Linux distros (debian, arch, etc.) should be pre-installed with your system. If not, install GCC and G++ using the following commands:
 
 Debian: ``sudo apt install build-essential `` (Installs GCC, G++, and make.)
+
 Arch: ``sudo pacman -Syu gcc``
+
 centOS: ``sudo yum install gcc-c++``
+
 Fedora: ``sudo dnf groupinstall 'Development Tools'``
 
 > NOTE: You may also need to install ``g++-multilib`` and ``gcc-multilib``

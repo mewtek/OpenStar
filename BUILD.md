@@ -4,7 +4,7 @@
 ### This is for *building* OpenStar. If you're looking to just run the software, you should download the [latest release](https://github.com/mewtek/OpenStar/releases) instead
 
 ### Important Note:
-In order to build for one operating system, **you need to be on that operating system.** So, to build on Windows, you need to be on Windows, same with Linux, and same with macOS. If you don't want to multi-boot, you can probably build for different operating systems using a virtual machine, but I can't personally garuntee the compile time will be too great.
+In order to build for one operating system, **you need to be on that operating system.** So, to build on Windows, you need to be on Windows, same with Linux, and same with macOS. If you don't want to multi-boot, you can probably build for different operating systems using a virtual machine, but I can't personally guarantee the compile time will be too great.
 
 ## Set up compilers on Windows
 Setting up compilers on Windows is a bit more complicated than other operating systems. In order to download the compilers, you also need to download [Visual Studio](https://visualstudio.microsoft.com/downloads/). 

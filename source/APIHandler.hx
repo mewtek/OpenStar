@@ -1,5 +1,6 @@
 package;
 
+import openfl.utils.IAssetCache;
 import flixel.FlxG;
 import flixel.system.FlxAssets;
 import haxe.Json;
@@ -57,7 +58,13 @@ typedef SEVENDAYDATA =
 
 typedef ALMANAC = 
 {
-	// TODO: Add data types
+	var highRecordYear:Int;
+	var loRecordYear:Int;
+	var hiRecord:Int;
+	var loRecord:Int;
+	var hiAverage:Int;
+	var loAverage:Int;
+
 }
 
 typedef AQDATA =
@@ -81,6 +88,7 @@ class APIHandler
 	public static var _LOCATIONDATA:LOCATIONDATA;
 	public static var _FORECASTDATA:FORECASTDATA;
 	public static var _SEVENDAYDATA:SEVENDAYDATA;
+	public static var _ALMANACDATA:ALMANAC;
 
 	// IBM API DOCS: https://www.datamensional.com/weather-data-services/weather-company-data-api-documentation/
 	// Set up the API among other information using save data
@@ -96,6 +104,16 @@ class APIHandler
 
 		getLocationData(); // Do this so we dont have to run it in MainState;
 	}
+
+
+	/* 
+		! Most, if not all of these functions need to be fixed !
+		Alot of the functions below need error handling to account for 
+		variables that can be null values, as per IBM's documentation.
+
+		TODO: Fix lack of error handling
+	
+	*/ 
 
 	// https://weather.com/swagger-docs/ui/sun/v3/sunV3LocationSearch.json
 	public static function getLocationData():Void
@@ -191,10 +209,6 @@ class APIHandler
 				{
 					names.push(res.daypart[0].daypartName[i]);
 					narratives.push(res.daypart[0].narrative[i]);
-					
-					#if debug
-					trace(res.daypart[0].daypartName[i] + ": " + res.daypart[0].narrative[i]);
-					#end
 
 					if (res.daypart[0].narrative[i] == null)
 						narratives.push("Forecast not available.");
@@ -281,22 +295,53 @@ class APIHandler
 	// [API LINK]
 	public static function getRegionalCC():Void {}
 
-
+	// Obtains almanac data for the current day & month.
+	// https://docs.google.com/document/d/1CJo8FTWkyi1fXLw1Ze-rcLeTkMRtBsa0cpRvv6qO51U/edit#heading=h.gxuckzyw699m
 	public static function getAlmanac():Void
 	{
-		// TODO
+		// Note: error handling for this function is handled in its respective panel.
+		// Almanac calls require a date & month to be set when requesting data
+		var MONTH:Int = Date.now().getMonth();
+		var DAY:Int = Date.now().getDate();
+
+
+		var APIURL:String = 'https://api.weather.com/v3/wx/almanac/daily/1day?postalKey=$areaCode&format=json&units=$units&day=$DAY&month=$MONTH&apiKey=$APIKey';
+		var API = new haxe.Http(APIURL);
+	
+		API.onData = function(data:String)
+		{
+			var res = Json.parse(data);
+
+			_ALMANACDATA = {
+				loRecord: res.temperatureRecordMin[0],
+				hiRecord: res.temperatureRecordMax[0],
+				loRecordYear: res.almanacRecordYearMin[0],
+				highRecordYear: res.almanacRecordYearMax[0],
+				loAverage: res.temperatureAverageMin[0],
+				hiAverage: res.temperatureAverageMax[0]
+			}
+			
+		}
+
+		API.onError = function(msg:String)
+		{
+			trace("An error occurred while trying to grab the almanac data!");
+			trace(msg);
+		}
+
+		API.request();
 	}
 	
 
 	public static function getAirQuality():Void 
 	{
-		// TOOD
+		// TODO
 
 	}
 
 	// Pulls from MapBox to get the base map for Radar and whatnot.
 	// downloads as a 2560x1440 image instead of 1280x720.
-	// ! TODO: Rebuild the asset library for assets/images after this function is ran!!
+	// TODO: Rebuild the asset library for assets/images after this function is ran
 	public static function getMap():Void
 	{
 		trace("DOWNLOADING MAP DATA");

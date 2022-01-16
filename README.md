@@ -1,3 +1,11 @@
+# Notice of temporary hiatus
+Due to some unforeseen events regarding the API keys used for developing this, I have to temporary put this project on hold until I can find either a suitable API to replace the currrently in-place IBM Weather APIs, or until I can obtain another IBM API key for the currently in-place APIs.
+
+This isn't the end of this project, though! In the worst-case scenario, a new fork may be created with a different project scope than directly simulating the original IntelliStar software, and will likely use different APIs. 
+
+~June P.
+
+# Original README
 <p align="center">
 	<img width=750 src="https://i.imgur.com/uShXA4a.png"></img>
 	

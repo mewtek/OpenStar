@@ -1,9 +1,15 @@
-# Notice of temporary hiatus
-Due to some unforeseen events regarding the API keys used for developing this, I have to temporary put this project on hold until I can find either a suitable API to replace the currrently in-place IBM Weather APIs, or until I can obtain another IBM API key for the currently in-place APIs.
+# We're back in business!
+I've got new API Keys, a few months of free time, and alot of ideas for this emulator.
 
-This isn't the end of this project, though! In the worst-case scenario, a new fork may be created with a different project scope than directly simulating the original IntelliStar software, and will likely use different APIs. 
+So, for starters: **I may be abandoning HaxeFlixel and going strictly with OpenFL.**
+Not only would it be easier to compile for systems like the Raspberry Pi, but it would also provide a much more barebones, and generally more *customizable* way to work with OpenStar. The original HaxeFlixel versions will be available as its own branch, but from now on, the only "abandoned" part of openstar is the HaxeFlixel version as I begin to work more on the OpenFL port.
 
-~June P.
+As with that OpenFL port, that actually means like stuff like Radars and the like will work much better. HaxeFlixel has a habit of using Lime's resource caching, which is great for stuff like the primary emulator and it's graphics, but when it comes to adding new skin packs (e.g. to emulate the feel of the WeatherSTAR XL), and radar images, it's hard to get HaxeFlixel to load loose files without having to do some fuckery.
+
+This will just be a test! If I can't get a good product with the OpenFL version, then it's likely I'll come back to the HaxeFlixel version.
+
+I'm going to be updating the API keys for this version of the emulator so that it all works as intended. Just note that will not be a finished product using HaxeFlixel. Anything that seems to be broken is pretty much on you to fix.
+
 
 # Original README
 <p align="center">
